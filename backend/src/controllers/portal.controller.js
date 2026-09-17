@@ -5,6 +5,7 @@ import { studentSummary } from './attendance.controller.js';
 import { forStudent } from './homework.controller.js';
 import { studentResult } from './exam.controller.js';
 import { forStudent as feesForStudent } from './fee.controller.js';
+import { forStudent as timetableForStudent } from './timetable.controller.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -234,5 +235,12 @@ export const studentResultCard = asyncHandler(async (req, res) => {
 export const studentFees = asyncHandler(async (req, res) => {
     const student = await assertAccess(req, req.params.studentId);
     const data = await feesForStudent(req, student.id);
+    res.json({ success: true, data });
+});
+
+/** Mobile app ka timetable - student ki section ka weekly schedule. */
+export const studentTimetable = asyncHandler(async (req, res) => {
+    const student = await assertAccess(req, req.params.studentId);
+    const data = await timetableForStudent(req, student);
     res.json({ success: true, data });
 });

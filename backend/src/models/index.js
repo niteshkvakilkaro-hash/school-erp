@@ -20,6 +20,8 @@ import Mark from './Mark.js';
 import FeeHead from './FeeHead.js';
 import StudentFee from './StudentFee.js';
 import FeePayment from './FeePayment.js';
+import Period from './Period.js';
+import TimetableSlot from './TimetableSlot.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -28,7 +30,7 @@ import FeePayment from './FeePayment.js';
 const TENANT_MODELS = [
     User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject,
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
-    FeeHead, StudentFee, FeePayment,
+    FeeHead, StudentFee, FeePayment, Period, TimetableSlot,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -155,6 +157,23 @@ Student.hasMany(FeePayment, { foreignKey: 'studentId', as: 'payments', onDelete:
 FeePayment.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
 FeePayment.belongsTo(User, { foreignKey: 'collectedById', as: 'collectedBy' });
 
+/* ---------------- Timetable ---------------- */
+
+Period.hasMany(TimetableSlot, { foreignKey: 'periodId', as: 'slots', onDelete: 'CASCADE' });
+TimetableSlot.belongsTo(Period, { foreignKey: 'periodId', as: 'period' });
+
+SchoolClass.hasMany(TimetableSlot, { foreignKey: 'classId', as: 'timetable', onDelete: 'CASCADE' });
+TimetableSlot.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
+
+Section.hasMany(TimetableSlot, { foreignKey: 'sectionId', as: 'timetable', onDelete: 'CASCADE' });
+TimetableSlot.belongsTo(Section, { foreignKey: 'sectionId', as: 'section' });
+
+Subject.hasMany(TimetableSlot, { foreignKey: 'subjectId', as: 'slots', onDelete: 'CASCADE' });
+TimetableSlot.belongsTo(Subject, { foreignKey: 'subjectId', as: 'subject' });
+
+Teacher.hasMany(TimetableSlot, { foreignKey: 'teacherId', as: 'slots' });
+TimetableSlot.belongsTo(Teacher, { foreignKey: 'teacherId', as: 'teacher' });
+
 export {
     sequelize,
     School,
@@ -178,4 +197,6 @@ export {
     FeeHead,
     StudentFee,
     FeePayment,
+    Period,
+    TimetableSlot,
 };

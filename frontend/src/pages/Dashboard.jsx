@@ -13,6 +13,7 @@ import { TableWrap, Table, THead, TBody, TR, TH, TD, EmptyRow } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { QuickActions } from '@/components/dashboard/QuickActions';
+import { TodayClasses } from '@/components/dashboard/TodayClasses';
 import { formatCurrency, formatDate, fullName, titleCase } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
@@ -232,12 +233,17 @@ export default function Dashboard() {
                 </Card>
             </div>
 
-            {/* ---------- Quick actions + class strength ---------- */}
+            {/* ---------- Quick actions + today's classes ---------- */}
             <div className="grid gap-4 lg:grid-cols-3">
                 <div className="lg:col-span-2">
                     <QuickActions />
                 </div>
 
+                <TodayClasses data={data?.todayClasses} loading={loading} />
+            </div>
+
+            {/* Horizontal bars - full width par behtar padhe jaate hain */}
+            <div className="grid gap-4">
                 <Card>
                     <CardHeader>
                         <CardTitle>Class-wise strength</CardTitle>

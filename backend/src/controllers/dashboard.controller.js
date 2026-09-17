@@ -4,6 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { scopedWhere } from '../utils/tenant.js';
 import { todaySnapshot } from './attendance.controller.js';
 import { feeSnapshot } from './fee.controller.js';
+import { todaySchedule } from './timetable.controller.js';
 
 const daysAgo = (n) => {
     const d = new Date();
@@ -181,6 +182,7 @@ export const stats = asyncHandler(async (req, res) => {
             byClass: byClass.map((c) => ({ ...c, studentCount: Number(c.studentCount) })),
             attendanceToday: await todaySnapshot(req),
             fees: await feeSnapshot(req),
+            todayClasses: await todaySchedule(req, { limit: 6 }),
             admissionsTrend: await admissionsTrend(req),
             recentActivities: await recentActivities(req),
             recentAdmissions,

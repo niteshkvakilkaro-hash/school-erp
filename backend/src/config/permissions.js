@@ -34,6 +34,9 @@ export const PERMISSIONS = [
     { slug: 'subjects.manage', module: 'Subjects', label: 'Subject banana / edit / delete' },
 
 
+    { slug: 'timetable.view', module: 'Timetable', label: 'Timetable dekhna' },
+    { slug: 'timetable.manage', module: 'Timetable', label: 'Periods aur timetable set karna' },
+
     { slug: 'attendance.view', module: 'Attendance', label: 'Attendance dekhna' },
     { slug: 'attendance.mark', module: 'Attendance', label: 'Attendance mark karna' },
     { slug: 'attendance.report', module: 'Attendance', label: 'Attendance reports dekhna' },
@@ -104,6 +107,7 @@ export const SYSTEM_ROLES = [
             'users.view',
             'roles.view',
             'school.settings.view',
+            'timetable.view',
             'attendance.view',
             'attendance.report',
             'homework.view',
@@ -126,6 +130,7 @@ export const SYSTEM_ROLES = [
             'classes.view',
             'sections.view',
             'subjects.view',
+            'timetable.view',
             'attendance.view',
             'attendance.mark',
             'attendance.report',

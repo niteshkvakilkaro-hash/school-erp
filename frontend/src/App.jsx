@@ -11,6 +11,7 @@ import Teachers from '@/pages/Teachers';
 import Classes from '@/pages/Classes';
 import Sections from '@/pages/Sections';
 import Subjects from '@/pages/Subjects';
+import Timetable from '@/pages/Timetable';
 import Attendance from '@/pages/Attendance';
 import Homework from '@/pages/Homework';
 import Exams from '@/pages/Exams';
@@ -114,6 +115,14 @@ export default function App() {
                                 element={
                                     <ProtectedRoute permissions={['subjects.view']}>
                                         <Subjects />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="timetable"
+                                element={
+                                    <ProtectedRoute permissions={['timetable.view']}>
+                                        <Timetable />
                                     </ProtectedRoute>
                                 }
                             />

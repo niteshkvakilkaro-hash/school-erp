@@ -47,6 +47,8 @@ chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
 | `fee_heads` | Fee categories - Tuition, Transport waghairah |
 | `student_fees` | Kis student par kaunsi fee, kitni paid, kitni baaki |
 | `fee_payments` | Har receipt - amount, mode, kisne li |
+| `periods` | School ka bell schedule - Period 1, lunch waghairah |
+| `timetable_slots` | Section x day x period par kaunsa subject aur teacher |
 
 ## Setup
 
@@ -95,7 +97,7 @@ badal sakta hai — ya apna naya role bana sakta hai.
 | Super Admin *(platform)* | Schools, plans, subscriptions, kisi bhi school me enter |
 | School Admin | Apne school ka sab kuch |
 | Principal | Sab view + students edit + results publish + fee reports |
-| Teacher | Students view/add/edit, attendance mark, homework, marks entry |
+| Teacher | Students view/add/edit, attendance mark, homework, marks entry, apna timetable |
 | Accountant | Fees - heads, assign, collection aur reports |
 | Student *(app)* | Apna record |
 | Parent *(app)* | Apne bachcho ka record |
@@ -125,8 +127,8 @@ API ka pata `mobile/.env` me set hota hai:
 
 Tabs: **Home** (bachche ka card, stats, teachers), **Attendance** (percent donut +
 day-wise history), **Fees** (paid/pending progress + head-wise breakup + receipts),
-**Results** (exam chips, grade aur subject-wise marks) aur **More** (homework,
-profile, subjects, school info, logout).
+**Results** (exam chips, grade aur subject-wise marks) aur **More** (timetable,
+homework, profile, subjects, school info, logout).
 Parent ke ek se zyada bachche hon to upar chips se child switch hota hai.
 
 App sirf parent/student roles ke liye khulta hai — staff login karega to login
@@ -173,10 +175,14 @@ GET    /fees/students           GET  /fees/students/:studentId
 POST   /fees/assign             GET  /fees/payments
 POST   /fees/payments           DELETE /fees/payments/:id
 
+GET    /timetable               GET  /timetable/today   GET /timetable/teacher
+GET    /timetable/periods       POST/PUT/DELETE /timetable/periods/:id
+POST   /timetable/slots         DELETE /timetable/slots/:id
+
 --- Portal (mobile app) ---
 GET    /portal/me/students      GET /portal/school
 GET    /portal/students/:id     /subjects    /teachers
-GET    /portal/students/:id/attendance   /homework   /exams   /fees
+GET    /portal/students/:id/attendance   /homework   /exams   /fees   /timetable
 GET    /portal/students/:id/exams/:examId/result
 ```
 
@@ -212,6 +218,9 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 - Payment lena aur cancel karna ek transaction me hota hai - receipt, fee line ka paid amount aur status teeno saath badalte hain.
 - Jo fee head students par laga hua hai wo delete nahi hota (inactive kar sakte hain).
 - Ek student par ek fee head sirf ek baar lagta hai - dobara assign karne par duplicate nahi banta.
+- Ek teacher ek waqt me do jagah nahi ho sakta - timetable slot save karte waqt clash check hota hai aur batata hai wo kahan busy hain.
+- Break period me class assign nahi hoti, aur jis period me classes lagi hain wo period delete/break nahi ban sakta.
+- Ek section ke ek period par ek hi subject rehta hai - dobara set karne par replace hota hai.
 
 ## Useful commands
 
@@ -228,7 +237,6 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 Phase 1 me sirf core hai. Ye modules abhi baaki hain — models aur permission
 catalog aise banaye gaye hain ki ye seedha add ho jayenge:
 
-- Timetable (period-wise schedule)
 - Notices / announcements
 - Library, Transport, Inventory
 - Homework submissions (abhi sirf assign hota hai, student upload nahi karta)
