@@ -1,4 +1,9 @@
-import { Student, SchoolClass, Section, Subject, Teacher, User, School } from '../models/index.js';
+import { Op } from 'sequelize';
+import { Student, SchoolClass, Section, Subject, Teacher, User, School, Exam } from '../models/index.js';
+import { scopedWhere } from '../utils/tenant.js';
+import { studentSummary } from './attendance.controller.js';
+import { forStudent } from './homework.controller.js';
+import { studentResult } from './exam.controller.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -178,4 +183,48 @@ export const schoolInfo = asyncHandler(async (req, res) => {
     });
     if (!school) throw ApiError.notFound('School not found');
     res.json({ success: true, data: school });
+});
+
+/* ---------------- Attendance / homework / results (mobile app) ---------------- */
+
+/** Student ki attendance summary + recent records. */
+export const studentAttendance = asyncHandler(async (req, res) => {
+    const student = await assertAccess(req, req.params.studentId);
+    const summary = await studentSummary(req, student.id, req.query);
+    res.json({ success: true, data: summary });
+});
+
+/** Us student ki class/section ka homework. */
+export const studentHomework = asyncHandler(async (req, res) => {
+    const student = await assertAccess(req, req.params.studentId);
+    const items = await forStudent(req, student, { limit: 30 });
+    res.json({ success: true, data: items });
+});
+
+/**
+ * Sirf wahi exams jinke results publish ho chuke hain - parents ko
+ * adhoora ya bina check kiya result nahi dikhna chahiye.
+ */
+export const studentExams = asyncHandler(async (req, res) => {
+    const student = await assertAccess(req, req.params.studentId);
+
+    const where = scopedWhere(req, { resultsPublished: true });
+    if (student.classId) {
+        where[Op.or] = [{ classId: null }, { classId: student.classId }];
+    }
+
+    const exams = await Exam.findAll({
+        where,
+        attributes: ['id', 'name', 'type', 'startDate', 'endDate'],
+        order: [['startDate', 'DESC']],
+        limit: 12,
+    });
+
+    res.json({ success: true, data: exams });
+});
+
+export const studentResultCard = asyncHandler(async (req, res) => {
+    const student = await assertAccess(req, req.params.studentId);
+    const result = await studentResult(req, req.params.examId, student.id, { onlyPublished: true });
+    res.json({ success: true, data: result });
 });

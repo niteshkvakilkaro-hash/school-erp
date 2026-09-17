@@ -99,25 +99,33 @@ export const listSchools = asyncHandler(async (req, res) => {
         where[Op.or] = [{ name: { [Op.like]: q } }, { code: { [Op.like]: q } }, { city: { [Op.like]: q } }];
     }
 
+    // Subscriptions hasMany hai - subQuery:false ke saath join karne par LIMIT
+    // joined rows par lag jaata hai. Isliye alag query se laate hain.
     const { rows, count } = await School.findAndCountAll({
         where,
         attributes: { include: counts },
-        include: [
-            {
-                model: Subscription,
-                required: false,
-                where: { status: 'active' },
-                include: [{ model: Plan, as: 'plan', attributes: ['id', 'name', 'code'] }],
-            },
-        ],
         order: [['createdAt', 'DESC']],
         limit,
         offset,
-        distinct: true,
         subQuery: false,
     });
 
-    res.json({ success: true, data: paginated({ rows, count, page, limit }) });
+    const subs = await Subscription.findAll({
+        where: { schoolId: rows.map((r) => r.id), status: 'active' },
+        include: [{ model: Plan, as: 'plan', attributes: ['id', 'name', 'code'] }],
+    });
+    const bySchool = {};
+    for (const s of subs) (bySchool[s.schoolId] ||= []).push(s);
+
+    res.json({
+        success: true,
+        data: paginated({
+            rows: rows.map((r) => ({ ...r.toJSON(), Subscriptions: bySchool[r.id] || [] })),
+            count,
+            page,
+            limit,
+        }),
+    });
 });
 
 export const getSchool = asyncHandler(async (req, res) => {

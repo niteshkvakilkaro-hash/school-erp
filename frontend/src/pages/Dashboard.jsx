@@ -5,7 +5,7 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import {
-    GraduationCap, Users, School, BookOpen, UserPlus, CalendarDays, ArrowRight,
+    GraduationCap, Users, School, BookOpen, UserPlus, CalendarDays, ArrowRight, ClipboardCheck,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -63,6 +63,7 @@ export default function Dashboard() {
     const counts = data?.counts || {};
     const growth = data?.growth || {};
     const seats = data?.seats || {};
+    const att = data?.attendanceToday;
     const today = new Date().toLocaleDateString('en-IN', {
         weekday: 'short',
         day: 'numeric',
@@ -130,11 +131,17 @@ export default function Dashboard() {
                     hint={loading ? undefined : (seats.percent ?? 0) + '% seats bhari hain'}
                 />
                 <StatCard
-                    icon={BookOpen}
+                    icon={ClipboardCheck}
                     tone="amber"
-                    label="Subjects"
-                    value={loading ? '-' : counts.subjects ?? 0}
-                    hint={loading ? undefined : (counts.parents ?? 0) + ' parent accounts'}
+                    label="Attendance Today"
+                    value={loading ? '-' : att?.percent != null ? att.percent + '%' : 'Not marked'}
+                    hint={
+                        loading
+                            ? undefined
+                            : att?.marked
+                              ? att.marked + ' marked · ' + att.counts.absent + ' absent'
+                              : 'Aaj ki attendance abhi baaki hai'
+                    }
                 />
             </div>
 

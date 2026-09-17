@@ -40,6 +40,10 @@ chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
 | `teachers` / `students` | Profile + `school_id` |
 | `student_guardians` | Parent login se bachche ka link (many-to-many) |
 | `classes` / `sections` / `subjects` | Academics, sab `school_id` ke saath |
+| `attendance` | Roz ki attendance - ek student ka ek din me ek record |
+| `homework` | Class/section wise assignments, due date ke saath |
+| `exams` / `exam_subjects` | Exam aur uski datesheet (kaunsa paper kab) |
+| `marks` | Har student ke har paper ke marks |
 
 ## Setup
 
@@ -87,8 +91,8 @@ badal sakta hai — ya apna naya role bana sakta hai.
 | --- | --- |
 | Super Admin *(platform)* | Schools, plans, subscriptions, kisi bhi school me enter |
 | School Admin | Apne school ka sab kuch |
-| Principal | Sab view + students edit |
-| Teacher | Students view/add/edit, academics view |
+| Principal | Sab view + students edit + results publish |
+| Teacher | Students view/add/edit, attendance mark, homework, marks entry |
 | Accountant | Dashboard, students view (fees module aane par expand hoga) |
 | Student *(app)* | Apna record |
 | Parent *(app)* | Apne bachcho ka record |
@@ -116,8 +120,9 @@ API ka pata `mobile/.env` me set hota hai:
 | iOS simulator | `http://localhost:5000/api` |
 | Asli phone (Expo Go) | `http://<laptop-ka-LAN-IP>:5000/api` |
 
-Tabs: **Home** (bachche ka card, stats, teachers), **Profile** (poori details),
-**Subjects** (class ke subjects + teacher), **School** (school info + logout).
+Tabs: **Home** (bachche ka card, stats, teachers), **Attendance** (percent donut +
+day-wise history), **Homework** (pending/overdue ke saath), **Results** (exam chips,
+grade aur subject-wise marks) aur **More** (profile, subjects, school info, logout).
 Parent ke ek se zyada bachche hon to upar chips se child switch hota hai.
 
 App sirf parent/student roles ke liye khulta hai — staff login karega to login
@@ -148,9 +153,22 @@ GET    /classes   /classes/options                  POST/PUT/DELETE /classes/:id
 GET    /sections                POST/PUT/DELETE /sections/:id
 GET    /subjects                POST/PUT/DELETE /subjects/:id
 
+GET    /attendance/roster       POST /attendance/bulk
+GET    /attendance/report       GET  /attendance/student/:studentId
+
+GET    /homework                POST/PUT/DELETE /homework/:id
+
+GET    /exams                   POST/PUT/DELETE /exams/:id
+GET    /exams/:id/result        POST /exams/:id/publish
+GET    /exams/:id/report-card/:studentId
+POST   /exams/:id/schedule      DELETE /exams/schedule/:scheduleId
+GET    /exams/schedule/:scheduleId/marks   POST (same path to save)
+
 --- Portal (mobile app) ---
 GET    /portal/me/students      GET /portal/school
 GET    /portal/students/:id     /subjects    /teachers
+GET    /portal/students/:id/attendance   /homework   /exams
+GET    /portal/students/:id/exams/:examId/result
 ```
 
 Response shape hamesha ek jaisa:
@@ -176,6 +194,11 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 - School delete karne ke liye `?confirm=<SCHOOL_CODE>` bhejna padta hai — poora
   tenant data cascade me hat jata hai.
 - Pass marks max marks se zyada nahi ho sakte.
+- Aane wali date ki attendance mark nahi hoti; dobara mark karne par record update hota hai (duplicate nahi banta).
+- Homework ki due date assigned date se pehle nahi ho sakti; exam ki end date start se pehle nahi.
+- Paper ke max marks se zyada marks reject hote hain; absent student ke marks null rehte hain.
+- Jis exam/paper ke marks bhare ja chuke hain wo delete nahi hota.
+- Exam shuru hone se pehle result publish nahi hota, aur parents ko sirf published result dikhta hai.
 
 ## Useful commands
 
@@ -192,10 +215,11 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 Phase 1 me sirf core hai. Ye modules abhi baaki hain — models aur permission
 catalog aise banaye gaye hain ki ye seedha add ho jayenge:
 
-- Attendance + Timetable
-- Exams, marks, report card
 - Fees + accounting (Accountant role abhi placeholder permissions par hai)
-- Notices / announcements (app me dikhane ke liye)
+- Timetable (period-wise schedule)
+- Notices / announcements
+- Library, Transport, Inventory
+- Homework submissions (abhi sirf assign hota hai, student upload nahi karta)
 
 ## Production notes
 

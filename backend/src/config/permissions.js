@@ -33,6 +33,19 @@ export const PERMISSIONS = [
     { slug: 'subjects.view', module: 'Subjects', label: 'Subjects dekhna' },
     { slug: 'subjects.manage', module: 'Subjects', label: 'Subject banana / edit / delete' },
 
+
+    { slug: 'attendance.view', module: 'Attendance', label: 'Attendance dekhna' },
+    { slug: 'attendance.mark', module: 'Attendance', label: 'Attendance mark karna' },
+    { slug: 'attendance.report', module: 'Attendance', label: 'Attendance reports dekhna' },
+
+    { slug: 'homework.view', module: 'Homework', label: 'Homework dekhna' },
+    { slug: 'homework.manage', module: 'Homework', label: 'Homework dena / edit / delete' },
+
+    { slug: 'exams.view', module: 'Exams', label: 'Exams aur datesheet dekhna' },
+    { slug: 'exams.manage', module: 'Exams', label: 'Exam banana aur datesheet set karna' },
+    { slug: 'exams.marks', module: 'Exams', label: 'Marks bharna' },
+    { slug: 'exams.publish', module: 'Exams', label: 'Results publish karna' },
+
     { slug: 'users.view', module: 'Users', label: 'School ke user accounts dekhna' },
     { slug: 'users.manage', module: 'Users', label: 'User banana / role badalna / delete' },
 
@@ -86,6 +99,11 @@ export const SYSTEM_ROLES = [
             'users.view',
             'roles.view',
             'school.settings.view',
+            'attendance.view',
+            'attendance.report',
+            'homework.view',
+            'exams.view',
+            'exams.publish',
         ],
     },
     {
@@ -101,6 +119,13 @@ export const SYSTEM_ROLES = [
             'classes.view',
             'sections.view',
             'subjects.view',
+            'attendance.view',
+            'attendance.mark',
+            'attendance.report',
+            'homework.view',
+            'homework.manage',
+            'exams.view',
+            'exams.marks',
         ],
     },
     {
@@ -108,7 +133,7 @@ export const SYSTEM_ROLES = [
         name: 'Accountant',
         scope: 'school',
         description: 'Fees aur accounts (fees module aane par expand hoga)',
-        permissions: ['dashboard.view', 'students.view', 'classes.view', 'sections.view'],
+        permissions: ['dashboard.view', 'students.view', 'classes.view', 'sections.view', 'attendance.view'],
     },
     {
         slug: 'student',

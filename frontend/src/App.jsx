@@ -11,6 +11,9 @@ import Teachers from '@/pages/Teachers';
 import Classes from '@/pages/Classes';
 import Sections from '@/pages/Sections';
 import Subjects from '@/pages/Subjects';
+import Attendance from '@/pages/Attendance';
+import Homework from '@/pages/Homework';
+import Exams from '@/pages/Exams';
 import Users from '@/pages/Users';
 import Roles from '@/pages/Roles';
 import SchoolSettings from '@/pages/SchoolSettings';
@@ -110,6 +113,30 @@ export default function App() {
                                 element={
                                     <ProtectedRoute permissions={['subjects.view']}>
                                         <Subjects />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="attendance"
+                                element={
+                                    <ProtectedRoute permissions={['attendance.view', 'attendance.mark']}>
+                                        <Attendance />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="homework"
+                                element={
+                                    <ProtectedRoute permissions={['homework.view']}>
+                                        <Homework />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="exams"
+                                element={
+                                    <ProtectedRoute permissions={['exams.view']}>
+                                        <Exams />
                                     </ProtectedRoute>
                                 }
                             />

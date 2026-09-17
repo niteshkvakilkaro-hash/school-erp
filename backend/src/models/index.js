@@ -12,12 +12,20 @@ import StudentGuardian from './StudentGuardian.js';
 import SchoolClass from './SchoolClass.js';
 import Section from './Section.js';
 import Subject from './Subject.js';
+import Attendance from './Attendance.js';
+import Homework from './Homework.js';
+import Exam from './Exam.js';
+import ExamSubject from './ExamSubject.js';
+import Mark from './Mark.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
 // Har tenant-scoped model School se judta hai. School delete hone par uska
 // poora data cascade me hat jata hai.
-const TENANT_MODELS = [User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject, Role, Subscription];
+const TENANT_MODELS = [
+    User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject,
+    Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
+];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
     Model.belongsTo(School, { foreignKey: 'schoolId', as: 'school' });
@@ -91,6 +99,40 @@ Student.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
 Section.hasMany(Student, { foreignKey: 'sectionId', as: 'students' });
 Student.belongsTo(Section, { foreignKey: 'sectionId', as: 'section' });
 
+/* ---------------- Attendance ---------------- */
+
+Student.hasMany(Attendance, { foreignKey: 'studentId', as: 'attendance', onDelete: 'CASCADE' });
+Attendance.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+Attendance.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
+Attendance.belongsTo(Section, { foreignKey: 'sectionId', as: 'section' });
+Attendance.belongsTo(User, { foreignKey: 'markedById', as: 'markedBy' });
+
+/* ---------------- Homework ---------------- */
+
+SchoolClass.hasMany(Homework, { foreignKey: 'classId', as: 'homework', onDelete: 'CASCADE' });
+Homework.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
+Homework.belongsTo(Section, { foreignKey: 'sectionId', as: 'section' });
+Homework.belongsTo(Subject, { foreignKey: 'subjectId', as: 'subject' });
+Homework.belongsTo(Teacher, { foreignKey: 'teacherId', as: 'teacher' });
+Teacher.hasMany(Homework, { foreignKey: 'teacherId', as: 'homework' });
+
+/* ---------------- Exams & marks ---------------- */
+
+Exam.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
+SchoolClass.hasMany(Exam, { foreignKey: 'classId', as: 'exams' });
+
+Exam.hasMany(ExamSubject, { foreignKey: 'examId', as: 'schedule', onDelete: 'CASCADE' });
+ExamSubject.belongsTo(Exam, { foreignKey: 'examId', as: 'exam' });
+ExamSubject.belongsTo(Subject, { foreignKey: 'subjectId', as: 'subject' });
+Subject.hasMany(ExamSubject, { foreignKey: 'subjectId', as: 'examSubjects' });
+
+ExamSubject.hasMany(Mark, { foreignKey: 'examSubjectId', as: 'marks', onDelete: 'CASCADE' });
+Mark.belongsTo(ExamSubject, { foreignKey: 'examSubjectId', as: 'examSubject' });
+
+Student.hasMany(Mark, { foreignKey: 'studentId', as: 'marks', onDelete: 'CASCADE' });
+Mark.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+Mark.belongsTo(User, { foreignKey: 'enteredById', as: 'enteredBy' });
+
 export {
     sequelize,
     School,
@@ -106,4 +148,9 @@ export {
     SchoolClass,
     Section,
     Subject,
+    Attendance,
+    Homework,
+    Exam,
+    ExamSubject,
+    Mark,
 };

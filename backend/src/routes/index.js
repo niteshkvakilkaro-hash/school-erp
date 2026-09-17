@@ -10,6 +10,9 @@ import teacherRoutes from './teacher.routes.js';
 import classRoutes from './class.routes.js';
 import sectionRoutes from './section.routes.js';
 import subjectRoutes from './subject.routes.js';
+import attendanceRoutes from './attendance.routes.js';
+import homeworkRoutes from './homework.routes.js';
+import examRoutes from './exam.routes.js';
 import { authenticate, resolveTenant, requireTenant, can } from '../middleware/auth.js';
 import { stats } from '../controllers/dashboard.controller.js';
 
@@ -44,5 +47,8 @@ router.use('/teachers', teacherRoutes);
 router.use('/classes', classRoutes);
 router.use('/sections', sectionRoutes);
 router.use('/subjects', subjectRoutes);
+router.use('/attendance', attendanceRoutes);
+router.use('/homework', homeworkRoutes);
+router.use('/exams', examRoutes);
 
 export default router;

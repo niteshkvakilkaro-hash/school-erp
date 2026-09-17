@@ -7,21 +7,46 @@ import { StudentProvider } from '../context/StudentContext';
 import { useTheme } from '../context/ThemeContext';
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
+import AttendanceScreen from '../screens/AttendanceScreen';
+import HomeworkScreen from '../screens/HomeworkScreen';
+import ResultsScreen from '../screens/ResultsScreen';
+import MoreScreen from '../screens/MoreScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SubjectsScreen from '../screens/SubjectsScreen';
 import SchoolScreen from '../screens/SchoolScreen';
 import { Loader } from '../components/ui';
 
 const Stack = createNativeStackNavigator();
+const MoreStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Emoji icons - koi extra icon package install karne ki zaroorat nahi padti
 const ICONS = {
     Home: '\u{1F3E0}',
-    Profile: '\u{1F464}',
-    Subjects: '\u{1F4DA}',
-    School: '\u{1F3EB}',
+    Attendance: '\u{1F4C5}',
+    Homework: '\u{1F4DD}',
+    Results: '\u{1F4CA}',
+    More: '\u{2630}',
 };
+
+/** "More" tab ke andar ka stack - kam use hone wale screens. */
+function MoreNavigator() {
+    const { colors } = useTheme();
+    return (
+        <MoreStack.Navigator
+            screenOptions={{
+                headerStyle: { backgroundColor: colors.card },
+                headerTintColor: colors.foreground,
+                headerTitleStyle: { fontSize: 16 },
+            }}
+        >
+            <MoreStack.Screen name="MoreMenu" component={MoreScreen} options={{ headerShown: false }} />
+            <MoreStack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Student profile' }} />
+            <MoreStack.Screen name="Subjects" component={SubjectsScreen} options={{ title: 'Subjects' }} />
+            <MoreStack.Screen name="School" component={SchoolScreen} options={{ title: 'School info' }} />
+        </MoreStack.Navigator>
+    );
+}
 
 function Tabs() {
     const { colors } = useTheme();
@@ -48,9 +73,10 @@ function Tabs() {
             })}
         >
             <Tab.Screen name="Home" component={HomeScreen} />
-            <Tab.Screen name="Profile" component={ProfileScreen} />
-            <Tab.Screen name="Subjects" component={SubjectsScreen} />
-            <Tab.Screen name="School" component={SchoolScreen} />
+            <Tab.Screen name="Attendance" component={AttendanceScreen} />
+            <Tab.Screen name="Homework" component={HomeworkScreen} />
+            <Tab.Screen name="Results" component={ResultsScreen} />
+            <Tab.Screen name="More" component={MoreNavigator} />
         </Tab.Navigator>
     );
 }

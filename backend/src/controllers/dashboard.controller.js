@@ -2,6 +2,7 @@ import { Op, fn, col, literal } from 'sequelize';
 import { User, Teacher, Student, SchoolClass, Section, Subject, Role } from '../models/index.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { scopedWhere } from '../utils/tenant.js';
+import { todaySnapshot } from './attendance.controller.js';
 
 const daysAgo = (n) => {
     const d = new Date();
@@ -177,6 +178,7 @@ export const stats = asyncHandler(async (req, res) => {
                 count: Number(g.count),
             })),
             byClass: byClass.map((c) => ({ ...c, studentCount: Number(c.studentCount) })),
+            attendanceToday: await todaySnapshot(req),
             admissionsTrend: await admissionsTrend(req),
             recentActivities: await recentActivities(req),
             recentAdmissions,

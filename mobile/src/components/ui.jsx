@@ -126,6 +126,9 @@ export function Badge({ children, tone = 'default' }) {
         default: { bg: colors.accent, fg: colors.accentForeground },
         muted: { bg: colors.muted, fg: colors.mutedForeground },
         warning: { bg: colors.warning + '22', fg: colors.warning },
+        danger: { bg: colors.destructive + '22', fg: colors.destructive },
+        info: { bg: colors.secondary, fg: colors.secondaryForeground },
+        success: { bg: colors.accent, fg: colors.success },
     };
     const t = tones[tone] || tones.default;
 

@@ -44,10 +44,13 @@ export const list = asyncHandler(async (req, res) => {
     if (req.query.status) where.status = req.query.status;
     if (req.query.search) where.name = { [Op.like]: '%' + req.query.search + '%' };
 
+    // hasMany include ko yahan join nahi karte: subQuery:false ke saath LIMIT
+    // joined rows par lagta hai, isliye 2 sections wali class 2 rows kha jaati hai.
+    // Sections alag query se laakar attach karte hain.
     const { rows, count } = await SchoolClass.findAndCountAll({
         where,
         attributes: { include: [studentCountLiteral] },
-        include: [teacherInclude, { model: Section, as: 'sections', attributes: ['id', 'name'] }],
+        include: [teacherInclude],
         order: [
             ['level', 'ASC'],
             ['name', 'ASC'],
@@ -58,7 +61,23 @@ export const list = asyncHandler(async (req, res) => {
         subQuery: false,
     });
 
-    res.json({ success: true, data: paginated({ rows, count, page, limit }) });
+    const sections = await Section.findAll({
+        where: { classId: rows.map((r) => r.id) },
+        attributes: ['id', 'name', 'classId'],
+        order: [['name', 'ASC']],
+    });
+    const byClass = {};
+    for (const s of sections) (byClass[s.classId] ||= []).push({ id: s.id, name: s.name });
+
+    res.json({
+        success: true,
+        data: paginated({
+            rows: rows.map((r) => ({ ...r.toJSON(), sections: byClass[r.id] || [] })),
+            count,
+            page,
+            limit,
+        }),
+    });
 });
 
 /** Dropdowns ke liye - bina pagination ke poori list. */

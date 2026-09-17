@@ -14,9 +14,15 @@ import {
     SchoolClass,
     Section,
     Subject,
+    Attendance,
+    Homework,
+    Exam,
+    ExamSubject,
+    Mark,
 } from '../models/index.js';
 import { PERMISSIONS, SYSTEM_ROLES } from '../config/permissions.js';
 import { seedRolesForSchool, syncRolePermissions } from '../services/rbac.service.js';
+import { seedAttendance, seedHomework, seedExams } from './_academics.js';
 
 const FORCE = process.argv.includes('--force');
 
@@ -150,7 +156,7 @@ async function seedSchool(def, planMap) {
     const roles = await seedRolesForSchool(school.id);
 
     // School Admin
-    await User.create({
+    const adminUser = await User.create({
         schoolId: school.id,
         roleId: roles['school-admin'].id,
         name: def.admin[0],
@@ -238,7 +244,7 @@ async function seedSchool(def, planMap) {
             });
         }
     }
-    return { school, roles, classes, sections, teachers };
+    return { school, roles, classes, sections, teachers, users: { admin: adminUser } };
 }
 
 /** Students + ek demo student login + ek demo parent login. */
@@ -344,10 +350,19 @@ async function run() {
         const studentCount = await seedStudents(ctx, def);
         const domain = def.admin[1].split('@')[1];
 
+        const attendanceRows = await seedAttendance(ctx.school, ctx.classes, ctx.sections, ctx.users);
+        const homeworkRows = await seedHomework(ctx.school, ctx.classes, ctx.teachers);
+        const examStats = await seedExams(ctx.school, ctx.classes, ctx.users);
+
         console.log(
             '[seed] ' + def.name + ' (' + def.code + '): ' +
             def.teachers.length + ' teachers, ' + ctx.classes.length + ' classes, ' +
             ctx.sections.length + ' sections, ' + studentCount + ' students'
+        );
+        console.log(
+            '         academics: ' + attendanceRows + ' attendance rows, ' + homeworkRows +
+            ' homework, ' + examStats.exams + ' exams, ' + examStats.papers + ' papers, ' +
+            examStats.marks + ' marks'
         );
 
         lines.push('  ' + def.name + '  [' + def.code + ']');
