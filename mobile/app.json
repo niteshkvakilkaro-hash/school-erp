@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "ERPSC School",
+    "slug": "erpsc-school",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "erpsc",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#042f24"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.erpsc.school"
+    },
+    "android": {
+      "package": "in.erpsc.school",
+      "adaptiveIcon": {
+        "backgroundColor": "#059669"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "apiUrl": "http://10.0.2.2:5000/api"
+    }
+  }
+}

@@ -1,0 +1,131 @@
+/**
+ * Poore system ka permission catalog. Seeder isi se `permissions` table bharta hai
+ * aur UI "Roles & Permissions" screen par isi ko module-wise group karke dikhata hai.
+ *
+ * Naya module add karo -> yahan permissions likho -> `npm run db:seed` -> ho gaya.
+ */
+export const PERMISSIONS = [
+    // ---- Platform (sirf Super Admin) ----
+    { slug: 'platform.dashboard.view', module: 'Platform', label: 'Platform dashboard dekhna', scope: 'platform' },
+    { slug: 'platform.schools.view', module: 'Platform', label: 'Schools ki list dekhna', scope: 'platform' },
+    { slug: 'platform.schools.manage', module: 'Platform', label: 'School banana / edit / suspend', scope: 'platform' },
+    { slug: 'platform.plans.manage', module: 'Platform', label: 'Plans aur subscriptions manage karna', scope: 'platform' },
+
+    // ---- School ----
+    { slug: 'dashboard.view', module: 'Dashboard', label: 'School dashboard dekhna' },
+
+    { slug: 'students.view', module: 'Students', label: 'Students dekhna' },
+    { slug: 'students.create', module: 'Students', label: 'Naya admission karna' },
+    { slug: 'students.update', module: 'Students', label: 'Student edit karna' },
+    { slug: 'students.delete', module: 'Students', label: 'Student delete karna' },
+
+    { slug: 'teachers.view', module: 'Teachers', label: 'Teachers dekhna' },
+    { slug: 'teachers.create', module: 'Teachers', label: 'Teacher add karna' },
+    { slug: 'teachers.update', module: 'Teachers', label: 'Teacher edit karna' },
+    { slug: 'teachers.delete', module: 'Teachers', label: 'Teacher delete karna' },
+
+    { slug: 'classes.view', module: 'Classes', label: 'Classes dekhna' },
+    { slug: 'classes.manage', module: 'Classes', label: 'Class banana / edit / delete' },
+
+    { slug: 'sections.view', module: 'Sections', label: 'Sections dekhna' },
+    { slug: 'sections.manage', module: 'Sections', label: 'Section banana / edit / delete' },
+
+    { slug: 'subjects.view', module: 'Subjects', label: 'Subjects dekhna' },
+    { slug: 'subjects.manage', module: 'Subjects', label: 'Subject banana / edit / delete' },
+
+    { slug: 'users.view', module: 'Users', label: 'School ke user accounts dekhna' },
+    { slug: 'users.manage', module: 'Users', label: 'User banana / role badalna / delete' },
+
+    { slug: 'roles.view', module: 'Roles', label: 'Roles dekhna' },
+    { slug: 'roles.manage', module: 'Roles', label: 'Role banana aur permissions set karna' },
+
+    { slug: 'school.settings.view', module: 'School', label: 'School profile dekhna' },
+    { slug: 'school.settings.update', module: 'School', label: 'School profile edit karna' },
+
+    // ---- Portal (mobile app) ----
+    { slug: 'portal.self.view', module: 'Portal', label: 'Apna student record dekhna' },
+    { slug: 'portal.child.view', module: 'Portal', label: 'Apne bachche ka record dekhna' },
+];
+
+export const PERMISSION_SLUGS = PERMISSIONS.map((p) => p.slug);
+
+const schoolOnly = (slugs) => slugs.filter((s) => !s.startsWith('platform.'));
+
+/**
+ * Har naye school me ye roles automatically ban jaate hain.
+ * School Admin inhe baad me apni marzi se edit kar sakta hai.
+ */
+export const SYSTEM_ROLES = [
+    {
+        slug: 'super-admin',
+        name: 'Super Admin',
+        scope: 'platform',
+        description: 'Poora SaaS platform - saare schools, plans aur billing',
+        permissions: PERMISSION_SLUGS,
+    },
+    {
+        slug: 'school-admin',
+        name: 'School Admin',
+        scope: 'school',
+        description: 'Apne school ka sab kuch',
+        permissions: schoolOnly(PERMISSION_SLUGS).filter((s) => !s.startsWith('portal.')),
+    },
+    {
+        slug: 'principal',
+        name: 'Principal',
+        scope: 'school',
+        description: 'Sab kuch dekh sakte hain, students edit kar sakte hain',
+        permissions: [
+            'dashboard.view',
+            'students.view',
+            'students.update',
+            'teachers.view',
+            'classes.view',
+            'sections.view',
+            'subjects.view',
+            'users.view',
+            'roles.view',
+            'school.settings.view',
+        ],
+    },
+    {
+        slug: 'teacher',
+        name: 'Teacher',
+        scope: 'school',
+        description: 'Apni classes ke students aur academics',
+        permissions: [
+            'dashboard.view',
+            'students.view',
+            'students.create',
+            'students.update',
+            'classes.view',
+            'sections.view',
+            'subjects.view',
+        ],
+    },
+    {
+        slug: 'accountant',
+        name: 'Accountant',
+        scope: 'school',
+        description: 'Fees aur accounts (fees module aane par expand hoga)',
+        permissions: ['dashboard.view', 'students.view', 'classes.view', 'sections.view'],
+    },
+    {
+        slug: 'student',
+        name: 'Student',
+        scope: 'school',
+        portalOnly: true,
+        description: 'Mobile app - apna record',
+        permissions: ['portal.self.view'],
+    },
+    {
+        slug: 'parent',
+        name: 'Parent',
+        scope: 'school',
+        portalOnly: true,
+        description: 'Mobile app - apne bachcho ka record',
+        permissions: ['portal.child.view'],
+    },
+];
+
+export const SCHOOL_ROLE_TEMPLATES = SYSTEM_ROLES.filter((r) => r.scope === 'school');

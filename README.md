@@ -1,1 +1,207 @@
-# school-erp
+# ERPSC — Multi-tenant School Management SaaS
+
+Ek platform, kai schools. Node.js + Express + MySQL backend, React admin panel,
+aur React Native (Expo) app parents aur students ke liye.
+
+Theme tokens `ngoking/ngo-latest` se liye gaye hain — emerald brand, deep-green
+sidebar, light + dark mode. Wahi values mobile app me bhi hain (`mobile/src/lib/theme.js`).
+
+```
+erpsc/
+├── backend/    Node + Express + Sequelize   -> API (web + app dono ke liye)
+├── frontend/   React + Vite + Tailwind v4   -> Super Admin + School admin panel
+└── mobile/     React Native (Expo)          -> Parent + Student app
+```
+
+## Database kahan banta hai
+
+| | |
+| --- | --- |
+| Server | XAMPP ka MySQL / MariaDB, `127.0.0.1:3306` |
+| Database | `erpsc_saas` (ek hi DB, har row par `school_id`) |
+| Files on disk | `C:\xampp\mysql\data\erpsc_saas\` |
+| Dekhne ke liye | phpMyAdmin -> http://localhost/phpmyadmin |
+| Config | [backend/.env](backend/.env) ka `DB_NAME` |
+
+Database khud ban jata hai — `ensureDatabaseExists()` `CREATE DATABASE IF NOT EXISTS`
+chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
+
+### Tables
+
+| Table | Kya rakhta hai |
+| --- | --- |
+| `schools` | Har tenant — name, code, city, status (active/trial/suspended) |
+| `plans` | SaaS pricing — price, max students, max teachers |
+| `subscriptions` | Kaunsa school kis plan par, kab tak |
+| `permissions` | Poora permission catalog (`students.create` jaise slugs) |
+| `roles` | `school_id` null = platform role, warna us school ka role |
+| `role_permissions` | Role se permission ka mapping |
+| `users` | Sab logins. Email **per-school** unique hai |
+| `teachers` / `students` | Profile + `school_id` |
+| `student_guardians` | Parent login se bachche ka link (many-to-many) |
+| `classes` / `sections` / `subjects` | Academics, sab `school_id` ke saath |
+
+## Setup
+
+```bash
+npm run setup     # deps + database + demo data (2 schools ke saath)
+npm run dev       # API :5000 + admin panel :5173
+npm run dev:app   # Expo app (alag terminal me), ya sab ek saath: npm run dev:all
+```
+
+### Demo logins
+
+| Kaun | Email | Password |
+| --- | --- | --- |
+| **Super Admin** (platform) | admin@school.com | admin123 |
+| School Admin — Sunrise | admin@sunrise.com | admin123 |
+| Teacher — Sunrise | anita.sharma@sunrise.com | teacher123 |
+| **Parent** (app) | parent@sunrise.com | parent123 |
+| **Student** (app) | student@sunrise.com | student123 |
+| School Admin — Green Valley | admin@greenvalley.com | admin123 |
+
+## Multi-tenancy kaise kaam karta hai
+
+Shared database + `school_id` har tenant table par.
+
+- Login par JWT me `schoolId` jaata hai. Us token se banne wali har query
+  [`scopedWhere(req)`](backend/src/utils/tenant.js) se guzarti hai, jo `school_id`
+  chipka deta hai. Controllers khud kabhi bina scope ke `where` nahi banate.
+- Kisi doosre school ka id URL me daalne par **404** milta hai (403 nahi — taki
+  id exist karti hai ya nahi ye leak na ho).
+- Foreign keys bhi check hote hain: doosre school ka `classId`/`teacherId`/`roleId`
+  apne record par nahi laga sakte (`assertSameTenant`).
+- **Super Admin** ka `school_id` null hota hai. Wo `X-School-Id` header bhej kar
+  kisi bhi school ke andar ja sakta hai — UI me Schools page se "enter" karke.
+  Andar rehte hue peela banner dikhta hai taki galti se kaam na ho jaye.
+- Ek hi email do schools me ho sakta hai. Login par dono match hue to API
+  `needsSchoolChoice` bhejta hai aur UI school picker dikhata hai.
+
+## Roles & Permissions
+
+Roles database me hain, code me nahi. Har naye school me ye default roles
+automatically ban jaate hain, aur School Admin inke permissions checkbox se
+badal sakta hai — ya apna naya role bana sakta hai.
+
+| Role | Default access |
+| --- | --- |
+| Super Admin *(platform)* | Schools, plans, subscriptions, kisi bhi school me enter |
+| School Admin | Apne school ka sab kuch |
+| Principal | Sab view + students edit |
+| Teacher | Students view/add/edit, academics view |
+| Accountant | Dashboard, students view (fees module aane par expand hoga) |
+| Student *(app)* | Apna record |
+| Parent *(app)* | Apne bachcho ka record |
+
+Naya permission add karna ho to [backend/src/config/permissions.js](backend/src/config/permissions.js)
+me slug likhiye aur `npm run db:seed` chala dijiye — UI me apne aap module-wise
+group ban jayega.
+
+Guards dono taraf hain: menu item aur buttons permission ke bina dikhte hi nahi,
+aur API bhi 403 deta hai.
+
+## Mobile app (Expo)
+
+```bash
+cd mobile
+npm start          # QR code aayega, phone par Expo Go se scan kijiye
+npm run android    # Android emulator
+```
+
+API ka pata `mobile/.env` me set hota hai:
+
+| Kahan chala rahe ho | `EXPO_PUBLIC_API_URL` |
+| --- | --- |
+| Android emulator | `http://10.0.2.2:5000/api` |
+| iOS simulator | `http://localhost:5000/api` |
+| Asli phone (Expo Go) | `http://<laptop-ka-LAN-IP>:5000/api` |
+
+Tabs: **Home** (bachche ka card, stats, teachers), **Profile** (poori details),
+**Subjects** (class ke subjects + teacher), **School** (school info + logout).
+Parent ke ek se zyada bachche hon to upar chips se child switch hota hai.
+
+App sirf parent/student roles ke liye khulta hai — staff login karega to login
+screen par hi saaf message milta hai ki web panel use kijiye.
+
+## API
+
+Base `/api`. Protected routes ko `Authorization: Bearer <token>` chahiye.
+
+```
+POST   /auth/login              GET  /auth/me            POST /auth/change-password
+GET    /auth/schools            (public - login screen ke liye)
+
+--- Platform (sirf Super Admin) ---
+GET    /platform/stats
+GET    /platform/schools        POST /platform/schools    PUT/DELETE /platform/schools/:id
+GET    /platform/plans          POST /platform/plans      PUT/DELETE /platform/plans/:id
+POST   /platform/subscriptions
+
+--- School (super admin bhi, X-School-Id header ke saath) ---
+GET    /dashboard/stats         GET/PUT /school
+GET    /roles  /roles/permissions  /roles/options    POST/PUT/DELETE /roles/:id
+GET    /users                   POST/PUT/DELETE /users/:id
+GET    /students                POST/PUT/DELETE /students/:id
+GET    /students/next-admission-no
+GET    /teachers  /teachers/options                 POST/PUT/DELETE /teachers/:id
+GET    /classes   /classes/options                  POST/PUT/DELETE /classes/:id
+GET    /sections                POST/PUT/DELETE /sections/:id
+GET    /subjects                POST/PUT/DELETE /subjects/:id
+
+--- Portal (mobile app) ---
+GET    /portal/me/students      GET /portal/school
+GET    /portal/students/:id     /subjects    /teachers
+```
+
+Response shape hamesha ek jaisa:
+
+```jsonc
+{ "success": true, "data": { "items": [], "meta": { "total": 48, "page": 1, "limit": 10, "totalPages": 5 } } }
+
+// error - errors[] ko UI inline field errors me map karta hai
+{ "success": false, "message": "Validation failed", "errors": [{ "field": "firstName", "message": "First name required" }] }
+```
+
+## Data integrity rules
+
+Ye sab backend me enforce hote hain, sirf UI me nahi:
+
+- Students wali class ya section delete nahi hoti.
+- Section hamesha usi class ka hona chahiye jo student par set hai.
+- Teacher delete par uske subjects, sections aur class-teacher assignment auto-unassign.
+- Student/teacher delete par unka login bhi usi transaction me hatta hai.
+- Default (system) role delete nahi hota; jis role par users hain wo bhi nahi.
+- Platform permissions kisi school role par assign nahi ho sakti.
+- Apna khud ka role ya status koi nahi badal sakta (lock-out se bachne ke liye).
+- School delete karne ke liye `?confirm=<SCHOOL_CODE>` bhejna padta hai — poora
+  tenant data cascade me hat jata hai.
+- Pass marks max marks se zyada nahi ho sakte.
+
+## Useful commands
+
+| Command | Kaam |
+| --- | --- |
+| `npm run dev` | API + admin panel |
+| `npm run dev:all` | API + admin panel + Expo app |
+| `npm run db:seed` | Tables sync + permissions + super admin (demo data preserve) |
+| `npm run db:reset` | Sab drop karke fresh demo data |
+| `npm run build` | Admin panel production build (`frontend/dist`) |
+
+## Abhi kya nahi bana
+
+Phase 1 me sirf core hai. Ye modules abhi baaki hain — models aur permission
+catalog aise banaye gaye hain ki ye seedha add ho jayenge:
+
+- Attendance + Timetable
+- Exams, marks, report card
+- Fees + accounting (Accountant role abhi placeholder permissions par hai)
+- Notices / announcements (app me dikhane ke liye)
+
+## Production notes
+
+- `backend/.env` me `JWT_SECRET` zaroor badliye, `NODE_ENV=production` set kijiye.
+- `CLIENT_URL` comma se alag karke kai origins le leta hai (web panel + Expo web dev).
+- `frontend/dist` ko kisi bhi static host se serve kijiye, `VITE_API_URL` me API ka
+  public URL daaliye. Dev me `/api` Vite proxy se jaata hai, isliye CORS nahi chahiye.
+- Schema abhi `sequelize.sync()` se banta hai. Production par proper migrations
+  (`sequelize-cli` ya `umzug`) par shift karna behtar rahega.
