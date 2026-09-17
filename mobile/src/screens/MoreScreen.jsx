@@ -5,6 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { Card, Title, Subtle, Avatar, Badge, Button } from '../components/ui';
 
 const ITEMS = [
+    { key: 'Homework', icon: '📝', label: 'Homework', sub: 'Pending aur overdue assignments' },
     { key: 'Profile', icon: '\u{1F464}', label: 'Student profile', sub: 'Poori details aur guardian info' },
     { key: 'Subjects', icon: '\u{1F4DA}', label: 'Subjects', sub: 'Class ke subjects aur teachers' },
     { key: 'School', icon: '\u{1F3EB}', label: 'School info', sub: 'Address, contact aur session' },

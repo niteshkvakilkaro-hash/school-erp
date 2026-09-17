@@ -44,6 +44,9 @@ chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
 | `homework` | Class/section wise assignments, due date ke saath |
 | `exams` / `exam_subjects` | Exam aur uski datesheet (kaunsa paper kab) |
 | `marks` | Har student ke har paper ke marks |
+| `fee_heads` | Fee categories - Tuition, Transport waghairah |
+| `student_fees` | Kis student par kaunsi fee, kitni paid, kitni baaki |
+| `fee_payments` | Har receipt - amount, mode, kisne li |
 
 ## Setup
 
@@ -91,9 +94,9 @@ badal sakta hai — ya apna naya role bana sakta hai.
 | --- | --- |
 | Super Admin *(platform)* | Schools, plans, subscriptions, kisi bhi school me enter |
 | School Admin | Apne school ka sab kuch |
-| Principal | Sab view + students edit + results publish |
+| Principal | Sab view + students edit + results publish + fee reports |
 | Teacher | Students view/add/edit, attendance mark, homework, marks entry |
-| Accountant | Dashboard, students view (fees module aane par expand hoga) |
+| Accountant | Fees - heads, assign, collection aur reports |
 | Student *(app)* | Apna record |
 | Parent *(app)* | Apne bachcho ka record |
 
@@ -121,8 +124,9 @@ API ka pata `mobile/.env` me set hota hai:
 | Asli phone (Expo Go) | `http://<laptop-ka-LAN-IP>:5000/api` |
 
 Tabs: **Home** (bachche ka card, stats, teachers), **Attendance** (percent donut +
-day-wise history), **Homework** (pending/overdue ke saath), **Results** (exam chips,
-grade aur subject-wise marks) aur **More** (profile, subjects, school info, logout).
+day-wise history), **Fees** (paid/pending progress + head-wise breakup + receipts),
+**Results** (exam chips, grade aur subject-wise marks) aur **More** (homework,
+profile, subjects, school info, logout).
 Parent ke ek se zyada bachche hon to upar chips se child switch hota hai.
 
 App sirf parent/student roles ke liye khulta hai — staff login karega to login
@@ -164,10 +168,15 @@ GET    /exams/:id/report-card/:studentId
 POST   /exams/:id/schedule      DELETE /exams/schedule/:scheduleId
 GET    /exams/schedule/:scheduleId/marks   POST (same path to save)
 
+GET    /fees/summary            GET  /fees/heads    POST/PUT/DELETE /fees/heads/:id
+GET    /fees/students           GET  /fees/students/:studentId
+POST   /fees/assign             GET  /fees/payments
+POST   /fees/payments           DELETE /fees/payments/:id
+
 --- Portal (mobile app) ---
 GET    /portal/me/students      GET /portal/school
 GET    /portal/students/:id     /subjects    /teachers
-GET    /portal/students/:id/attendance   /homework   /exams
+GET    /portal/students/:id/attendance   /homework   /exams   /fees
 GET    /portal/students/:id/exams/:examId/result
 ```
 
@@ -199,6 +208,10 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 - Paper ke max marks se zyada marks reject hote hain; absent student ke marks null rehte hain.
 - Jis exam/paper ke marks bhare ja chuke hain wo delete nahi hota.
 - Exam shuru hone se pehle result publish nahi hota, aur parents ko sirf published result dikhta hai.
+- Payment pending se zyada nahi liya ja sakta, aur poori tarah paid fee par dobara payment nahi hota.
+- Payment lena aur cancel karna ek transaction me hota hai - receipt, fee line ka paid amount aur status teeno saath badalte hain.
+- Jo fee head students par laga hua hai wo delete nahi hota (inactive kar sakte hain).
+- Ek student par ek fee head sirf ek baar lagta hai - dobara assign karne par duplicate nahi banta.
 
 ## Useful commands
 
@@ -215,7 +228,6 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 Phase 1 me sirf core hai. Ye modules abhi baaki hain — models aur permission
 catalog aise banaye gaye hain ki ye seedha add ho jayenge:
 
-- Fees + accounting (Accountant role abhi placeholder permissions par hai)
 - Timetable (period-wise schedule)
 - Notices / announcements
 - Library, Transport, Inventory

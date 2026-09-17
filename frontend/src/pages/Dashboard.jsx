@@ -5,7 +5,7 @@ import {
     ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from 'recharts';
 import {
-    GraduationCap, Users, School, BookOpen, UserPlus, CalendarDays, ArrowRight, ClipboardCheck,
+    GraduationCap, Users, School, UserPlus, CalendarDays, ArrowRight, ClipboardCheck, Wallet,
 } from 'lucide-react';
 import api from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +13,7 @@ import { TableWrap, Table, THead, TBody, TR, TH, TD, EmptyRow } from '@/componen
 import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { QuickActions } from '@/components/dashboard/QuickActions';
-import { formatDate, fullName, titleCase } from '@/lib/utils';
+import { formatCurrency, formatDate, fullName, titleCase } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
 const PIE_COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-5)'];
@@ -64,6 +64,7 @@ export default function Dashboard() {
     const growth = data?.growth || {};
     const seats = data?.seats || {};
     const att = data?.attendanceToday;
+    const fees = data?.fees;
     const today = new Date().toLocaleDateString('en-IN', {
         weekday: 'short',
         day: 'numeric',
@@ -124,11 +125,17 @@ export default function Dashboard() {
                     }
                 />
                 <StatCard
-                    icon={School}
+                    icon={Wallet}
                     tone="blue"
-                    label="Classes & Sections"
-                    value={loading ? '-' : (counts.classes ?? 0) + ' / ' + (counts.sections ?? 0)}
-                    hint={loading ? undefined : (seats.percent ?? 0) + '% seats bhari hain'}
+                    label="Fee Collection"
+                    value={loading ? '-' : formatCurrency(fees?.collected ?? 0)}
+                    hint={
+                        loading
+                            ? undefined
+                            : fees?.totalFee
+                              ? fees.percent + '% collected, ' + formatCurrency(fees.pending) + ' pending'
+                              : 'Abhi koi fee assign nahi hui'
+                    }
                 />
                 <StatCard
                     icon={ClipboardCheck}

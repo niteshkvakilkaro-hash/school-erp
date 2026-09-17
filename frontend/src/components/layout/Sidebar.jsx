@@ -9,6 +9,7 @@ import {
     ClipboardCheck,
     NotebookPen,
     FileSpreadsheet,
+    Wallet,
     ShieldCheck,
     UserCog,
     Building2,
@@ -60,6 +61,12 @@ const SCHOOL_GROUPS = [
             { to: '/attendance', label: 'Attendance', icon: ClipboardCheck, perm: ['attendance.view', 'attendance.mark'] },
             { to: '/homework', label: 'Homework', icon: NotebookPen, perm: ['homework.view'] },
             { to: '/exams', label: 'Exams & Results', icon: FileSpreadsheet, perm: ['exams.view'] },
+        ],
+    },
+    {
+        title: 'Finance',
+        items: [
+            { to: '/fees', label: 'Fees & Payments', icon: Wallet, perm: ['fees.view'] },
         ],
     },
     {

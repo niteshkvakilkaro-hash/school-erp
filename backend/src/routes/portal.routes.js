@@ -15,6 +15,7 @@ router.get('/students/:studentId/teachers', ctrl.studentTeachers);
 router.get('/students/:studentId/attendance', ctrl.studentAttendance);
 router.get('/students/:studentId/homework', ctrl.studentHomework);
 router.get('/students/:studentId/exams', ctrl.studentExams);
+router.get('/students/:studentId/fees', ctrl.studentFees);
 router.get('/students/:studentId/exams/:examId/result', ctrl.studentResultCard);
 
 export default router;

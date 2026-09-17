@@ -23,6 +23,7 @@ import {
 import { PERMISSIONS, SYSTEM_ROLES } from '../config/permissions.js';
 import { seedRolesForSchool, syncRolePermissions } from '../services/rbac.service.js';
 import { seedAttendance, seedHomework, seedExams } from './_academics.js';
+import { seedFees } from './_fees.js';
 
 const FORCE = process.argv.includes('--force');
 
@@ -353,6 +354,7 @@ async function run() {
         const attendanceRows = await seedAttendance(ctx.school, ctx.classes, ctx.sections, ctx.users);
         const homeworkRows = await seedHomework(ctx.school, ctx.classes, ctx.teachers);
         const examStats = await seedExams(ctx.school, ctx.classes, ctx.users);
+        const feeStats = await seedFees(ctx.school, ctx.users);
 
         console.log(
             '[seed] ' + def.name + ' (' + def.code + '): ' +
@@ -363,6 +365,10 @@ async function run() {
             '         academics: ' + attendanceRows + ' attendance rows, ' + homeworkRows +
             ' homework, ' + examStats.exams + ' exams, ' + examStats.papers + ' papers, ' +
             examStats.marks + ' marks'
+        );
+        console.log(
+            '         fees: ' + feeStats.heads + ' heads, ' + feeStats.fees +
+            ' student fees, ' + feeStats.payments + ' payments'
         );
 
         lines.push('  ' + def.name + '  [' + def.code + ']');

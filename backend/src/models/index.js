@@ -17,6 +17,9 @@ import Homework from './Homework.js';
 import Exam from './Exam.js';
 import ExamSubject from './ExamSubject.js';
 import Mark from './Mark.js';
+import FeeHead from './FeeHead.js';
+import StudentFee from './StudentFee.js';
+import FeePayment from './FeePayment.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -25,6 +28,7 @@ import Mark from './Mark.js';
 const TENANT_MODELS = [
     User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject,
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
+    FeeHead, StudentFee, FeePayment,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -133,6 +137,24 @@ Student.hasMany(Mark, { foreignKey: 'studentId', as: 'marks', onDelete: 'CASCADE
 Mark.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
 Mark.belongsTo(User, { foreignKey: 'enteredById', as: 'enteredBy' });
 
+/* ---------------- Fees ---------------- */
+
+FeeHead.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
+SchoolClass.hasMany(FeeHead, { foreignKey: 'classId', as: 'feeHeads' });
+
+FeeHead.hasMany(StudentFee, { foreignKey: 'feeHeadId', as: 'studentFees', onDelete: 'CASCADE' });
+StudentFee.belongsTo(FeeHead, { foreignKey: 'feeHeadId', as: 'feeHead' });
+
+Student.hasMany(StudentFee, { foreignKey: 'studentId', as: 'fees', onDelete: 'CASCADE' });
+StudentFee.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+
+StudentFee.hasMany(FeePayment, { foreignKey: 'studentFeeId', as: 'payments', onDelete: 'CASCADE' });
+FeePayment.belongsTo(StudentFee, { foreignKey: 'studentFeeId', as: 'studentFee' });
+
+Student.hasMany(FeePayment, { foreignKey: 'studentId', as: 'payments', onDelete: 'CASCADE' });
+FeePayment.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+FeePayment.belongsTo(User, { foreignKey: 'collectedById', as: 'collectedBy' });
+
 export {
     sequelize,
     School,
@@ -153,4 +175,7 @@ export {
     Exam,
     ExamSubject,
     Mark,
+    FeeHead,
+    StudentFee,
+    FeePayment,
 };

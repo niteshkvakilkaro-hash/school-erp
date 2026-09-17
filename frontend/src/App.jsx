@@ -14,6 +14,7 @@ import Subjects from '@/pages/Subjects';
 import Attendance from '@/pages/Attendance';
 import Homework from '@/pages/Homework';
 import Exams from '@/pages/Exams';
+import Fees from '@/pages/Fees';
 import Users from '@/pages/Users';
 import Roles from '@/pages/Roles';
 import SchoolSettings from '@/pages/SchoolSettings';
@@ -137,6 +138,14 @@ export default function App() {
                                 element={
                                     <ProtectedRoute permissions={['exams.view']}>
                                         <Exams />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="fees"
+                                element={
+                                    <ProtectedRoute permissions={['fees.view']}>
+                                        <Fees />
                                     </ProtectedRoute>
                                 }
                             />

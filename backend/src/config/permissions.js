@@ -46,6 +46,11 @@ export const PERMISSIONS = [
     { slug: 'exams.marks', module: 'Exams', label: 'Marks bharna' },
     { slug: 'exams.publish', module: 'Exams', label: 'Results publish karna' },
 
+    { slug: 'fees.view', module: 'Fees', label: 'Fees aur dues dekhna' },
+    { slug: 'fees.manage', module: 'Fees', label: 'Fee heads banana aur students par lagana' },
+    { slug: 'fees.collect', module: 'Fees', label: 'Payment lena aur receipt banana' },
+    { slug: 'fees.report', module: 'Fees', label: 'Collection reports dekhna' },
+
     { slug: 'users.view', module: 'Users', label: 'School ke user accounts dekhna' },
     { slug: 'users.manage', module: 'Users', label: 'User banana / role badalna / delete' },
 
@@ -104,6 +109,8 @@ export const SYSTEM_ROLES = [
             'homework.view',
             'exams.view',
             'exams.publish',
+            'fees.view',
+            'fees.report',
         ],
     },
     {
@@ -132,8 +139,18 @@ export const SYSTEM_ROLES = [
         slug: 'accountant',
         name: 'Accountant',
         scope: 'school',
-        description: 'Fees aur accounts (fees module aane par expand hoga)',
-        permissions: ['dashboard.view', 'students.view', 'classes.view', 'sections.view', 'attendance.view'],
+        description: 'Fees collection, dues aur reports',
+        permissions: [
+            'dashboard.view',
+            'students.view',
+            'classes.view',
+            'sections.view',
+            'attendance.view',
+            'fees.view',
+            'fees.manage',
+            'fees.collect',
+            'fees.report',
+        ],
     },
     {
         slug: 'student',

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { UserPlus, School, BookOpen, UserCog, ClipboardCheck, NotebookPen, FileSpreadsheet } from 'lucide-react';
+import { UserPlus, School, UserCog, ClipboardCheck, NotebookPen, FileSpreadsheet, Wallet } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
@@ -15,7 +15,7 @@ const ACTIONS = [
     { to: '/attendance', label: 'Take Attendance', sub: 'Aaj ki class', icon: ClipboardCheck, perm: ['attendance.mark'], tone: 'amber' },
     { to: '/homework?new=1', label: 'Assign Homework', sub: 'Naya homework', icon: NotebookPen, perm: ['homework.manage'], tone: 'blue' },
     { to: '/exams?new=1', label: 'Create Exam', sub: 'Datesheet banaiye', icon: FileSpreadsheet, perm: ['exams.manage'], tone: 'violet' },
-    { to: '/subjects?new=1', label: 'Add Subject', sub: 'Subject banaiye', icon: BookOpen, perm: ['subjects.manage'], tone: 'brand' },
+    { to: '/fees', label: 'Collect Fee', sub: 'Payment lijiye', icon: Wallet, perm: ['fees.collect'], tone: 'brand' },
 ];
 
 const TONES = {
