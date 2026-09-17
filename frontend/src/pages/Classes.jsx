@@ -4,6 +4,7 @@ import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useNewParam } from '@/hooks/useNewParam';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,6 +76,11 @@ export default function Classes() {
         );
         setFormOpen(true);
     };
+
+    useNewParam(() => {
+        if (!canManage) return;
+        openForm(null);
+    });
 
     const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 

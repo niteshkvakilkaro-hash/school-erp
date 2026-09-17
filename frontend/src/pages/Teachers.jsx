@@ -4,6 +4,7 @@ import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useNewParam } from '@/hooks/useNewParam';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input, Select } from '@/components/ui/input';
@@ -35,6 +36,12 @@ export default function Teachers() {
     const [deleteBusy, setDeleteBusy] = useState(false);
 
     const search = useDebounce(searchInput, 400);
+
+    useNewParam(() => {
+        if (!canCreate) return;
+        setEditing(null);
+        setFormOpen(true);
+    });
 
     const load = useCallback(() => {
         setLoading(true);

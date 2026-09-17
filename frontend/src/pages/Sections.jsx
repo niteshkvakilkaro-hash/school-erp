@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { useNewParam } from '@/hooks/useNewParam';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Select } from '@/components/ui/input';
@@ -68,6 +69,11 @@ export default function Sections() {
         );
         setFormOpen(true);
     };
+
+    useNewParam(() => {
+        if (!canManage) return;
+        openForm(null);
+    });
 
     const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 

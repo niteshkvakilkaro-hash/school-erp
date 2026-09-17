@@ -4,6 +4,7 @@ import { Plus, Search, Pencil, Trash2, RotateCcw } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useNewParam } from '@/hooks/useNewParam';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input, Select } from '@/components/ui/input';
@@ -37,6 +38,12 @@ export default function Students() {
     const [deleteBusy, setDeleteBusy] = useState(false);
 
     const search = useDebounce(filters.search, 400);
+
+    useNewParam(() => {
+        if (!canCreate) return;
+        setEditing(null);
+        setFormOpen(true);
+    });
 
     useEffect(() => {
         api.get('/classes/options').then(({ data }) => setClasses(data.data));

@@ -17,31 +17,61 @@ import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 
-// Har item apni permission maangta hai - permission nahi to menu me dikhega hi nahi
-const PLATFORM_NAV = [
-    { to: '/platform', label: 'Platform', icon: LayoutDashboard, end: true, perm: ['platform.dashboard.view'] },
-    { to: '/platform/schools', label: 'Schools', icon: Building2, perm: ['platform.schools.view'] },
-    { to: '/platform/plans', label: 'Plans', icon: CreditCard, perm: ['platform.plans.manage'] },
+/**
+ * Reference design jaisa grouped menu. Har item apni permission maangta hai -
+ * permission nahi to wo item (aur khaali pad gaya group) dikhta hi nahi.
+ */
+const PLATFORM_GROUPS = [
+    {
+        items: [
+            { to: '/platform', label: 'Platform', icon: LayoutDashboard, end: true, perm: ['platform.dashboard.view'] },
+        ],
+    },
+    {
+        title: 'Tenants',
+        items: [
+            { to: '/platform/schools', label: 'Schools', icon: Building2, perm: ['platform.schools.view'] },
+            { to: '/platform/plans', label: 'Plans', icon: CreditCard, perm: ['platform.plans.manage'] },
+        ],
+    },
 ];
 
-const SCHOOL_NAV = [
-    { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true, perm: ['dashboard.view'] },
-    { to: '/students', label: 'Students', icon: GraduationCap, perm: ['students.view'] },
-    { to: '/teachers', label: 'Teachers', icon: Users, perm: ['teachers.view'] },
-    { to: '/classes', label: 'Classes', icon: School, perm: ['classes.view'] },
-    { to: '/sections', label: 'Sections', icon: Layers3, perm: ['sections.view'] },
-    { to: '/subjects', label: 'Subjects', icon: BookOpen, perm: ['subjects.view'] },
-    { to: '/users', label: 'Users', icon: UserCog, perm: ['users.view', 'users.manage'] },
-    { to: '/roles', label: 'Roles & Permissions', icon: ShieldCheck, perm: ['roles.view', 'roles.manage'] },
-    { to: '/settings', label: 'School settings', icon: Settings, perm: ['school.settings.view'] },
+const SCHOOL_GROUPS = [
+    {
+        items: [{ to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true, perm: ['dashboard.view'] }],
+    },
+    {
+        title: 'People',
+        items: [
+            { to: '/students', label: 'Students', icon: GraduationCap, perm: ['students.view'] },
+            { to: '/teachers', label: 'Teachers', icon: Users, perm: ['teachers.view'] },
+            { to: '/users', label: 'Staff & Parents', icon: UserCog, perm: ['users.view', 'users.manage'] },
+        ],
+    },
+    {
+        title: 'Academics',
+        items: [
+            { to: '/classes', label: 'Classes', icon: School, perm: ['classes.view'] },
+            { to: '/sections', label: 'Sections', icon: Layers3, perm: ['sections.view'] },
+            { to: '/subjects', label: 'Subjects', icon: BookOpen, perm: ['subjects.view'] },
+        ],
+    },
+    {
+        title: 'Settings',
+        items: [
+            { to: '/roles', label: 'Roles & Permissions', icon: ShieldCheck, perm: ['roles.view', 'roles.manage'] },
+            { to: '/settings', label: 'School Settings', icon: Settings, perm: ['school.settings.view'] },
+        ],
+    },
 ];
 
 function NavGroup({ title, items, onClose }) {
     if (items.length === 0) return null;
+
     return (
-        <div className="space-y-1">
+        <div className="space-y-0.5">
             {title ? (
-                <p className="px-3 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/50">
+                <p className="px-3 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/45">
                     {title}
                 </p>
             ) : null}
@@ -60,7 +90,7 @@ function NavGroup({ title, items, onClose }) {
                         )
                     }
                 >
-                    <Icon className="h-4.5 w-4.5 shrink-0" />
+                    <Icon className="h-[18px] w-[18px] shrink-0" />
                     {label}
                 </NavLink>
             ))}
@@ -71,12 +101,19 @@ function NavGroup({ title, items, onClose }) {
 export function Sidebar({ open, onClose }) {
     const { can, isPlatform, school } = useAuth();
 
-    const visible = (items) => items.filter((i) => can(...i.perm));
-    const platformItems = visible(PLATFORM_NAV);
+    // Group me se sirf allowed items, aur poora khaali group drop kar do
+    const visibleGroups = (groups) =>
+        groups
+            .map((g) => ({ ...g, items: g.items.filter((i) => can(...i.perm)) }))
+            .filter((g) => g.items.length > 0);
+
+    const platformGroups = visibleGroups(PLATFORM_GROUPS);
 
     // Super admin ke paas saari permissions hoti hain, par bina school chune
     // school ke modules kaam hi nahi karte - isliye tab tak chhupa dete hain.
-    const schoolItems = isPlatform && !school ? [] : visible(SCHOOL_NAV);
+    const schoolGroups = isPlatform && !school ? [] : visibleGroups(SCHOOL_GROUPS);
+
+    const showSectionLabels = platformGroups.length > 0 && schoolGroups.length > 0;
 
     return (
         <>
@@ -98,14 +135,16 @@ export function Sidebar({ open, onClose }) {
                 <div className="flex h-16 items-center justify-between gap-2 border-b border-sidebar-border px-5">
                     <div className="flex min-w-0 items-center gap-2.5">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                            <School className="h-5 w-5" />
+                            <GraduationCap className="h-5 w-5" />
                         </div>
                         <div className="min-w-0 leading-tight">
                             <p className="truncate text-sm font-semibold text-white">
                                 {school?.name || 'ERPSC'}
                             </p>
                             <p className="truncate text-[11px] text-sidebar-foreground/70">
-                                {isPlatform ? 'Platform console' : school?.code || 'School Management'}
+                                {isPlatform && !school
+                                    ? 'Platform console'
+                                    : school?.code || 'School Management'}
                             </p>
                         </div>
                     </div>
@@ -120,17 +159,24 @@ export function Sidebar({ open, onClose }) {
                     </Button>
                 </div>
 
-                <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-                    <NavGroup
-                        title={platformItems.length && schoolItems.length ? 'Platform' : null}
-                        items={platformItems}
-                        onClose={onClose}
-                    />
-                    <NavGroup
-                        title={platformItems.length && schoolItems.length ? 'School' : null}
-                        items={schoolItems}
-                        onClose={onClose}
-                    />
+                <nav className="flex-1 overflow-y-auto px-3 pb-4">
+                    {showSectionLabels && platformGroups.length ? (
+                        <p className="px-3 pb-1 pt-4 text-[10px] font-bold uppercase tracking-widest text-brand-400/70">
+                            Platform
+                        </p>
+                    ) : null}
+                    {platformGroups.map((g, i) => (
+                        <NavGroup key={'p' + i} title={g.title} items={g.items} onClose={onClose} />
+                    ))}
+
+                    {showSectionLabels ? (
+                        <p className="mt-4 border-t border-sidebar-border px-3 pb-1 pt-4 text-[10px] font-bold uppercase tracking-widest text-brand-400/70">
+                            School
+                        </p>
+                    ) : null}
+                    {schoolGroups.map((g, i) => (
+                        <NavGroup key={'s' + i} title={g.title} items={g.items} onClose={onClose} />
+                    ))}
                 </nav>
 
                 <div className="border-t border-sidebar-border px-5 py-4">
