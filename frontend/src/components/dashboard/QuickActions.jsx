@@ -41,7 +41,7 @@ export function QuickActions() {
                     <Link
                         key={to}
                         to={to}
-                        className="group rounded-xl border border-border bg-card p-4 transition-all hover:border-primary/40 hover:shadow-sm"
+                        className="group relative overflow-hidden rounded-xl border border-border bg-card p-4 shadow-card transition-all hover:border-primary/40 hover:shadow-card-hover"
                     >
                         <span
                             className={cn(

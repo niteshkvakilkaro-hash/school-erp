@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 export const TableWrap = ({ className, ...props }) => (
     <div
-        className={cn('w-full overflow-x-auto rounded-lg border border-border bg-card', className)}
+        className={cn('w-full overflow-x-auto rounded-xl border border-border bg-card shadow-card', className)}
         {...props}
     />
 );

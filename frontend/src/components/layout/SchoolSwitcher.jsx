@@ -32,7 +32,7 @@ export function SchoolSwitcher() {
             <DropdownMenu.Trigger asChild>
                 <button
                     className={cn(
-                        'flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors',
+                        'flex items-center gap-2 rounded-lg border px-3 py-2 text-sm shadow-xs transition-colors',
                         active
                             ? 'border-primary/40 bg-accent text-accent-foreground'
                             : 'border-border bg-card text-muted-foreground hover:bg-accent'
@@ -50,7 +50,7 @@ export function SchoolSwitcher() {
                 <DropdownMenu.Content
                     align="end"
                     sideOffset={8}
-                    className="z-50 max-h-80 w-64 overflow-y-auto rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-lg"
+                    className="z-50 max-h-80 w-64 overflow-y-auto rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-float"
                 >
                     <p className="px-3 py-2 text-xs text-muted-foreground">
                         School chuniye - uska data aise dikhega jaise aap us school me ho

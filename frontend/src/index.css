@@ -27,6 +27,19 @@
     --color-success: var(--success);
     --color-warning: var(--warning);
 
+    /*
+     * Shadows ngo-latest se: neutral grey ki jagah emerald-tinted glow un cheezo
+     * par jo primary hain (button, active nav, hero). Baaki sab par shadow-xs
+     * jaisa halka. rgba(16,185,129) = brand-500, rgba(52,211,153) = brand-400.
+     */
+    --shadow-brand: 0 6px 20px -8px rgba(16, 185, 129, 0.8);
+    --shadow-brand-lg: 0 12px 30px -10px rgba(16, 185, 129, 0.7);
+    --shadow-brand-xl: 0 24px 60px -30px rgba(16, 185, 129, 0.6);
+    --shadow-brand-hero: 0 40px 120px -30px rgba(16, 185, 129, 0.35);
+    --shadow-glow: 0 0 20px -4px rgba(52, 211, 153, 0.6);
+
+    --radius-2xl: calc(var(--radius) + 8px);
+    --radius-xl: calc(var(--radius) + 4px);
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
@@ -95,6 +108,16 @@
     --success: #047857;
     --warning: #b45309;
     --radius: 0.75rem;
+
+    /*
+     * Card shadows pure black ki jagah foreground green-black (#0b1f19) se tinted
+     * hain, taaki emerald background par shadow neutral grey na lage. Ye @theme me
+     * NAHI hain - Tailwind theme shadows ko inline kar deta hai aur phir dark mode
+     * override kaam nahi karta. Utilities neeche @utility se banti hain.
+     */
+    --shadow-card: 0 1px 2px rgba(11, 31, 25, 0.05), 0 4px 16px -4px rgba(11, 31, 25, 0.08);
+    --shadow-card-hover: 0 2px 4px rgba(11, 31, 25, 0.06), 0 14px 32px -10px rgba(11, 31, 25, 0.16);
+    --shadow-float: 0 4px 10px -2px rgba(11, 31, 25, 0.08), 0 24px 48px -16px rgba(11, 31, 25, 0.22);
     --sidebar: #042f24;
     --sidebar-foreground: #c9e9dc;
     --sidebar-primary: #10b981;
@@ -106,6 +129,11 @@
 }
 
 .dark {
+    /* Dark background par halki shadow gayab ho jaati hai - opacity badha dete hain */
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 16px -4px rgba(0, 0, 0, 0.5);
+    --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.45), 0 14px 32px -10px rgba(0, 0, 0, 0.6);
+    --shadow-float: 0 4px 10px -2px rgba(0, 0, 0, 0.5), 0 24px 48px -16px rgba(0, 0, 0, 0.7);
+
     --background: #06140f;
     --foreground: #e6f4ee;
     --card: #0c1f19;
@@ -140,6 +168,20 @@
     --sidebar-accent-foreground: #ffffff;
     --sidebar-border: rgba(110, 231, 183, 0.1);
     --sidebar-ring: #34d399;
+}
+
+
+/* Theme-aware shadows: var() reference karti hain, isliye .dark me badal jaati hain */
+@utility shadow-card {
+    box-shadow: var(--shadow-card);
+}
+
+@utility shadow-card-hover {
+    box-shadow: var(--shadow-card-hover);
+}
+
+@utility shadow-float {
+    box-shadow: var(--shadow-float);
 }
 
 @layer base {

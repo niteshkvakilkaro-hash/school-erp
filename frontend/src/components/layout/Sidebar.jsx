@@ -91,7 +91,7 @@ function NavGroup({ title, items, onClose }) {
                         cn(
                             'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                             isActive
-                                ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm'
+                                ? 'bg-linear-to-r from-brand-500/90 to-brand-600/90 font-semibold text-white shadow-brand'
                                 : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                         )
                     }
@@ -140,7 +140,7 @@ export function Sidebar({ open, onClose }) {
             >
                 <div className="flex h-16 items-center justify-between gap-2 border-b border-sidebar-border px-5">
                     <div className="flex min-w-0 items-center gap-2.5">
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground shadow-glow">
                             <GraduationCap className="h-5 w-5" />
                         </div>
                         <div className="min-w-0 leading-tight">

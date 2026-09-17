@@ -26,7 +26,7 @@ export function Topbar({ onMenu, onChangePassword }) {
 
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                    <button className="flex items-center gap-2.5 rounded-lg border border-border bg-card px-2 py-1.5 text-left transition-colors hover:bg-accent">
+                    <button className="flex items-center gap-2.5 rounded-lg border border-border bg-card px-2 py-1.5 text-left shadow-xs transition-colors hover:bg-accent">
                         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                             {initials(user?.name || 'U')}
                         </span>
@@ -44,7 +44,7 @@ export function Topbar({ onMenu, onChangePassword }) {
                     <DropdownMenu.Content
                         align="end"
                         sideOffset={8}
-                        className="z-50 w-56 overflow-hidden rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-lg"
+                        className="z-50 w-56 overflow-hidden rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-float"
                     >
                         <div className="px-3 py-2">
                             <p className="truncate text-sm font-medium">{user?.name}</p>

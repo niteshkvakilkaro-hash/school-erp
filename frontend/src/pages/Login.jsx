@@ -101,7 +101,7 @@ export default function Login() {
         <div className="relative flex min-h-screen items-center justify-center bg-brand-950 p-4 sm:p-8">
             <FloatingChips />
 
-            <div className="relative grid w-full max-w-5xl overflow-hidden rounded-2xl shadow-2xl lg:grid-cols-2">
+            <div className="relative grid w-full max-w-5xl overflow-hidden rounded-2xl shadow-brand-hero lg:grid-cols-2">
                 {/* ---------- Left: brand panel ---------- */}
                 <div className="relative hidden flex-col justify-between gap-10 bg-sidebar p-10 lg:flex">
                     <div
@@ -111,7 +111,7 @@ export default function Login() {
 
                     <div className="relative space-y-6">
                         <div className="flex items-center gap-3">
-                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground shadow-glow">
                                 <GraduationCap className="h-6 w-6" />
                             </div>
                             <p className="text-xl font-semibold text-white">
