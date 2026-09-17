@@ -14,6 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { TodayClasses } from '@/components/dashboard/TodayClasses';
+import { NoticeBoard } from '@/components/dashboard/NoticeBoard';
 import { formatCurrency, formatDate, fullName, titleCase } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
@@ -336,7 +337,11 @@ export default function Dashboard() {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <NoticeBoard items={data?.notices} loading={loading} />
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-3">
+                <Card className="lg:col-span-3">
                     <CardHeader>
                         <CardTitle>Recent activity</CardTitle>
                     </CardHeader>

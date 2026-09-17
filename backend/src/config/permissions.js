@@ -54,6 +54,9 @@ export const PERMISSIONS = [
     { slug: 'fees.collect', module: 'Fees', label: 'Payment lena aur receipt banana' },
     { slug: 'fees.report', module: 'Fees', label: 'Collection reports dekhna' },
 
+    { slug: 'notices.view', module: 'Notices', label: 'Notices dekhna' },
+    { slug: 'notices.manage', module: 'Notices', label: 'Notice banana / edit / delete' },
+
     { slug: 'users.view', module: 'Users', label: 'School ke user accounts dekhna' },
     { slug: 'users.manage', module: 'Users', label: 'User banana / role badalna / delete' },
 
@@ -108,6 +111,8 @@ export const SYSTEM_ROLES = [
             'roles.view',
             'school.settings.view',
             'timetable.view',
+            'notices.view',
+            'notices.manage',
             'attendance.view',
             'attendance.report',
             'homework.view',
@@ -131,6 +136,8 @@ export const SYSTEM_ROLES = [
             'sections.view',
             'subjects.view',
             'timetable.view',
+            'notices.view',
+            'notices.manage',
             'attendance.view',
             'attendance.mark',
             'attendance.report',
@@ -151,6 +158,7 @@ export const SYSTEM_ROLES = [
             'classes.view',
             'sections.view',
             'attendance.view',
+            'notices.view',
             'fees.view',
             'fees.manage',
             'fees.collect',
@@ -163,7 +171,7 @@ export const SYSTEM_ROLES = [
         scope: 'school',
         portalOnly: true,
         description: 'Mobile app - apna record',
-        permissions: ['portal.self.view'],
+        permissions: ['portal.self.view', 'notices.view'],
     },
     {
         slug: 'parent',
@@ -171,7 +179,7 @@ export const SYSTEM_ROLES = [
         scope: 'school',
         portalOnly: true,
         description: 'Mobile app - apne bachcho ka record',
-        permissions: ['portal.child.view'],
+        permissions: ['portal.child.view', 'notices.view'],
     },
 ];
 

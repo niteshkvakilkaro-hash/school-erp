@@ -22,6 +22,7 @@ import StudentFee from './StudentFee.js';
 import FeePayment from './FeePayment.js';
 import Period from './Period.js';
 import TimetableSlot from './TimetableSlot.js';
+import Notice from './Notice.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -30,7 +31,7 @@ import TimetableSlot from './TimetableSlot.js';
 const TENANT_MODELS = [
     User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject,
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
-    FeeHead, StudentFee, FeePayment, Period, TimetableSlot,
+    FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -174,6 +175,12 @@ TimetableSlot.belongsTo(Subject, { foreignKey: 'subjectId', as: 'subject' });
 Teacher.hasMany(TimetableSlot, { foreignKey: 'teacherId', as: 'slots' });
 TimetableSlot.belongsTo(Teacher, { foreignKey: 'teacherId', as: 'teacher' });
 
+/* ---------------- Notices ---------------- */
+
+Notice.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
+Notice.belongsTo(Section, { foreignKey: 'sectionId', as: 'section' });
+Notice.belongsTo(User, { foreignKey: 'createdById', as: 'createdBy' });
+
 export {
     sequelize,
     School,
@@ -199,4 +206,5 @@ export {
     FeePayment,
     Period,
     TimetableSlot,
+    Notice,
 };

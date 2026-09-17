@@ -6,6 +6,7 @@ import { forStudent } from './homework.controller.js';
 import { studentResult } from './exam.controller.js';
 import { forStudent as feesForStudent } from './fee.controller.js';
 import { forStudent as timetableForStudent } from './timetable.controller.js';
+import { forStudent as noticesForStudent } from './notice.controller.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -243,4 +244,11 @@ export const studentTimetable = asyncHandler(async (req, res) => {
     const student = await assertAccess(req, req.params.studentId);
     const data = await timetableForStudent(req, student);
     res.json({ success: true, data });
+});
+
+/** Mobile app ka Notices tab - student/parent ki audience ke hisaab se. */
+export const studentNotices = asyncHandler(async (req, res) => {
+    const student = await assertAccess(req, req.params.studentId);
+    const items = await noticesForStudent(req, student);
+    res.json({ success: true, data: items });
 });

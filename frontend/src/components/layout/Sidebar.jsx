@@ -11,6 +11,7 @@ import {
     NotebookPen,
     FileSpreadsheet,
     Wallet,
+    Megaphone,
     ShieldCheck,
     UserCog,
     Building2,
@@ -69,6 +70,12 @@ const SCHOOL_GROUPS = [
         title: 'Finance',
         items: [
             { to: '/fees', label: 'Fees & Payments', icon: Wallet, perm: ['fees.view'] },
+        ],
+    },
+    {
+        title: 'Communication',
+        items: [
+            { to: '/notices', label: 'Notices', icon: Megaphone, perm: ['notices.view'] },
         ],
     },
     {

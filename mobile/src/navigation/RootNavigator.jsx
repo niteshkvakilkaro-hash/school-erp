@@ -12,6 +12,7 @@ import HomeworkScreen from '../screens/HomeworkScreen';
 import ResultsScreen from '../screens/ResultsScreen';
 import FeesScreen from '../screens/FeesScreen';
 import TimetableScreen from '../screens/TimetableScreen';
+import NoticesScreen from '../screens/NoticesScreen';
 import MoreScreen from '../screens/MoreScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SubjectsScreen from '../screens/SubjectsScreen';
@@ -27,7 +28,7 @@ const ICONS = {
     Home: '\u{1F3E0}',
     Attendance: '\u{1F4C5}',
     Fees: '\u{1F4B0}',
-    Results: '\u{1F4CA}',
+    Notices: '\u{1F4E2}',
     More: '\u{2630}',
 };
 
@@ -43,6 +44,7 @@ function MoreNavigator() {
             }}
         >
             <MoreStack.Screen name="MoreMenu" component={MoreScreen} options={{ headerShown: false }} />
+            <MoreStack.Screen name="Results" component={ResultsScreen} options={{ title: 'Results' }} />
             <MoreStack.Screen name="Timetable" component={TimetableScreen} options={{ title: 'Timetable' }} />
             <MoreStack.Screen name="Homework" component={HomeworkScreen} options={{ title: 'Homework' }} />
             <MoreStack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Student profile' }} />
@@ -79,7 +81,7 @@ function Tabs() {
             <Tab.Screen name="Home" component={HomeScreen} />
             <Tab.Screen name="Attendance" component={AttendanceScreen} />
             <Tab.Screen name="Fees" component={FeesScreen} />
-            <Tab.Screen name="Results" component={ResultsScreen} />
+            <Tab.Screen name="Notices" component={NoticesScreen} />
             <Tab.Screen name="More" component={MoreNavigator} />
         </Tab.Navigator>
     );

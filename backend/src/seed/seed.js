@@ -25,6 +25,7 @@ import { seedRolesForSchool, syncRolePermissions } from '../services/rbac.servic
 import { seedAttendance, seedHomework, seedExams } from './_academics.js';
 import { seedFees } from './_fees.js';
 import { seedTimetable } from './_timetable.js';
+import { seedNotices } from './_notices.js';
 
 const FORCE = process.argv.includes('--force');
 
@@ -357,6 +358,7 @@ async function run() {
         const examStats = await seedExams(ctx.school, ctx.classes, ctx.users);
         const feeStats = await seedFees(ctx.school, ctx.users);
         const ttStats = await seedTimetable(ctx.school);
+        const noticeCount = await seedNotices(ctx.school, ctx.users);
 
         console.log(
             '[seed] ' + def.name + ' (' + def.code + '): ' +
@@ -376,6 +378,7 @@ async function run() {
             '         timetable: ' + ttStats.periods + ' periods, ' + ttStats.slots +
             ' slots (' + ttStats.withTeacher + ' with teacher)'
         );
+        console.log('         notices: ' + noticeCount);
 
         lines.push('  ' + def.name + '  [' + def.code + ']');
         lines.push('    School Admin : ' + def.admin[1] + '  / admin123');
