@@ -1,6 +1,6 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api, { TOKEN_KEY, setUnauthorizedHandler } from '../lib/api';
+import api, { TOKEN_KEY, setUnauthorizedHandler, loadServer } from '../lib/api';
 
 const AuthContext = createContext(null);
 
@@ -27,6 +27,8 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         (async () => {
+            // Login screen par chuna server (APK / tunnel link) pehle
+            await loadServer();
             const token = await AsyncStorage.getItem(TOKEN_KEY);
             if (!token) {
                 setLoading(false);

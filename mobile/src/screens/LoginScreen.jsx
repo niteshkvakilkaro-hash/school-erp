@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Button, Input, Title, Subtle, Card } from '../components/ui';
-import { API_URL } from '../lib/api';
+import { ServerSetting } from '../components/ServerSetting';
 
 export default function LoginScreen() {
     const { login } = useAuth();
@@ -165,7 +165,7 @@ export default function LoginScreen() {
                                     <Subtle>Parent: parent@sunrise.com / parent123</Subtle>
                                     <Subtle>Student: student@sunrise.com / student123</Subtle>
                                     <Subtle>Teacher: anita.sharma@sunrise.com / teacher123</Subtle>
-                                    <Subtle style={{ marginTop: 8, fontSize: 11 }}>API: {API_URL}</Subtle>
+                                    <ServerSetting />
                                 </Card>
                             </>
                         )}

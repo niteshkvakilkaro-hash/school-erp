@@ -183,11 +183,35 @@ Development me API ka address khud nikalta hai - jis laptop se Expo chal raha ha
 (port 5000). Emulator par `10.0.2.2`. APK / production build ke liye `EXPO_PUBLIC_API_URL`
 dena zaroori hai (`mobile/eas.json` me profile ke hisaab se).
 
-### Apne phone par test karna
+### Bina hosting ke public link (demo)
+
+Laptop hi server banta hai aur Cloudflare ka free tunnel ek **HTTPS link** deta hai - kisi bhi phone/computer
+se khulta hai, aur HTTPS hone se phone ke browser me camera + GPS bhi chalte hain.
+
+```bash
+npm run demo:build    # admin + website + mobile app (web) build - code badalne par dobara
+npm run demo:start    # port 5000 par sab: /  (admin), /site/<slug> (website), /app (mobile app), /api
+npm run demo:tunnel   # doosre terminal me - "https://....trycloudflare.com" link print hoga
+```
+
+- Link tabhi tak chalta hai jab tak laptop, XAMPP MySQL aur ye dono commands chalu hain. Har baar naya link milta hai.
+- Demo data aur demo passwords (admin123...) public ho jaate hain - test ke baad tunnel band kar dijiye.
+- App me login screen par **Server: ... Badliye** se naya link daal sakte hain (APK ko dobara banane ki zaroorat nahi).
+
+### APK banana (Expo cloud, free account)
+
+```bash
+cd mobile
+npx eas-cli login
+npx eas-cli build -p android --profile preview    # ~15-20 min, APK ka download link + QR milta hai
+```
+
+`preview` profile ka default server `mobile/eas.json` me hai; app ke andar login screen se kabhi bhi badal sakte hain.
+
 
 1. Laptop aur phone ek hi WiFi par hon.
 2. Root folder me: `npm run dev:phone` (API + admin panel + app, sab LAN par).
-3. Phone ke browser me: `http://<laptop-IP>:8081` - app (parent/student/teacher login).
+3. Phone ke browser me: `http://<laptop-IP>:8081` - app (parent/student/teacher login). Selfie/GPS ke liye upar wala HTTPS demo link behtar hai.
    Browser me camera aur GPS sirf HTTPS par chalte hain - selfie check-in test karne ke liye Expo Go / APK use kijiye,
    ya Android Chrome me `chrome://flags/#unsafely-treat-insecure-origin-as-secure` me `http://<laptop-IP>:8081` jod dijiye.
    Website: `http://<laptop-IP>:5173/site/sunrise-public-school`.

@@ -18,7 +18,15 @@ function distanceM(a, b) {
 
 async function fileFrom(photo) {
     if (Platform.OS === 'web') {
-        // Web par camera data-URL deta hai - Blob banana padta hai
+        // Web par camera data-URL deta hai - bina fetch ke Blob banao (strict CSP me fetch(data:) blocked hota hai)
+        if (photo.uri.startsWith('data:')) {
+            const [meta, b64] = photo.uri.split(',');
+            const type = (meta.match(/^data:([^;]+)/) || [])[1] || 'image/jpeg';
+            const bin = atob(b64);
+            const bytes = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+            return [new Blob([bytes], { type }), type === 'image/png' ? 'selfie.png' : 'selfie.jpg'];
+        }
         const blob = await (await fetch(photo.uri)).blob();
         return [blob, 'selfie.jpg'];
     }

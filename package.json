@@ -15,7 +15,10 @@
     "dev:web": "npm --prefix frontend run dev",
     "dev:app": "npm --prefix mobile start",
     "build": "npm --prefix frontend run build",
-    "start": "npm --prefix backend start"
+    "start": "npm --prefix backend start",
+    "demo:build": "node scripts/build-demo.mjs",
+    "demo:start": "npm --prefix backend start",
+    "demo:tunnel": "npx -y cloudflared tunnel --url http://localhost:5000"
   },
   "devDependencies": {
     "concurrently": "^9.1.0"

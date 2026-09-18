@@ -31,3 +31,6 @@ Thumbs.db
 # Uploads
 backend/uploads/
 backend/public/uploads/
+
+# Demo ke liye backend se serve hone wala mobile web build
+mobile/dist-web/
