@@ -14,6 +14,7 @@ import FeesScreen from '../screens/FeesScreen';
 import TimetableScreen from '../screens/TimetableScreen';
 import NoticesScreen from '../screens/NoticesScreen';
 import LibraryScreen from '../screens/LibraryScreen';
+import TransportScreen from '../screens/TransportScreen';
 import MoreScreen from '../screens/MoreScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SubjectsScreen from '../screens/SubjectsScreen';
@@ -49,6 +50,7 @@ function MoreNavigator() {
             <MoreStack.Screen name="Timetable" component={TimetableScreen} options={{ title: 'Timetable' }} />
             <MoreStack.Screen name="Homework" component={HomeworkScreen} options={{ title: 'Homework' }} />
             <MoreStack.Screen name="Library" component={LibraryScreen} options={{ title: 'Library' }} />
+            <MoreStack.Screen name="Transport" component={TransportScreen} options={{ title: 'Transport' }} />
             <MoreStack.Screen name="Profile" component={ProfileScreen} options={{ title: 'Student profile' }} />
             <MoreStack.Screen name="Subjects" component={SubjectsScreen} options={{ title: 'Subjects' }} />
             <MoreStack.Screen name="School" component={SchoolScreen} options={{ title: 'School info' }} />

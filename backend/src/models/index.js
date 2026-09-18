@@ -25,6 +25,10 @@ import TimetableSlot from './TimetableSlot.js';
 import Notice from './Notice.js';
 import Book from './Book.js';
 import BookIssue from './BookIssue.js';
+import Vehicle from './Vehicle.js';
+import TransportRoute from './TransportRoute.js';
+import RouteStop from './RouteStop.js';
+import StudentTransport from './StudentTransport.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -34,6 +38,7 @@ const TENANT_MODELS = [
     User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject,
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
     FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice, Book, BookIssue,
+    Vehicle, TransportRoute, RouteStop, StudentTransport,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -193,6 +198,19 @@ Student.hasMany(BookIssue, { foreignKey: 'studentId', as: 'bookIssues', onDelete
 BookIssue.belongsTo(User, { foreignKey: 'userId', as: 'borrower' });
 BookIssue.belongsTo(User, { foreignKey: 'issuedById', as: 'issuedBy' });
 
+/* ---------------- Transport ---------------- */
+
+TransportRoute.belongsTo(Vehicle, { foreignKey: 'vehicleId', as: 'vehicle' });
+Vehicle.hasMany(TransportRoute, { foreignKey: 'vehicleId', as: 'routes' });
+TransportRoute.hasMany(RouteStop, { foreignKey: 'routeId', as: 'stops', onDelete: 'CASCADE' });
+RouteStop.belongsTo(TransportRoute, { foreignKey: 'routeId', as: 'route' });
+TransportRoute.hasMany(StudentTransport, { foreignKey: 'routeId', as: 'riders' });
+StudentTransport.belongsTo(TransportRoute, { foreignKey: 'routeId', as: 'route' });
+StudentTransport.belongsTo(RouteStop, { foreignKey: 'stopId', as: 'stop' });
+RouteStop.hasMany(StudentTransport, { foreignKey: 'stopId', as: 'riders' });
+StudentTransport.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+Student.hasOne(StudentTransport, { foreignKey: 'studentId', as: 'transport', onDelete: 'CASCADE' });
+
 export {
     sequelize,
     School,
@@ -221,4 +239,8 @@ export {
     Notice,
     Book,
     BookIssue,
+    Vehicle,
+    TransportRoute,
+    RouteStop,
+    StudentTransport,
 };

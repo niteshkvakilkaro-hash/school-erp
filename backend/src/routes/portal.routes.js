@@ -19,6 +19,7 @@ router.get('/students/:studentId/fees', ctrl.studentFees);
 router.get('/students/:studentId/timetable', ctrl.studentTimetable);
 router.get('/students/:studentId/notices', ctrl.studentNotices);
 router.get('/students/:studentId/library', ctrl.studentLibrary);
+router.get('/students/:studentId/transport', ctrl.studentTransport);
 router.get('/students/:studentId/exams/:examId/result', ctrl.studentResultCard);
 
 export default router;

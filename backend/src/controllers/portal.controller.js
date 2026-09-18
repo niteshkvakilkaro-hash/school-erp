@@ -8,6 +8,7 @@ import { forStudent as feesForStudent } from './fee.controller.js';
 import { forStudent as timetableForStudent } from './timetable.controller.js';
 import { forStudent as noticesForStudent } from './notice.controller.js';
 import { forStudent as libraryForStudent } from './library.controller.js';
+import { forStudent as transportForStudent } from './transport.controller.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -258,5 +259,12 @@ export const studentNotices = asyncHandler(async (req, res) => {
 export const studentLibrary = asyncHandler(async (req, res) => {
     const student = await assertAccess(req, req.params.studentId);
     const data = await libraryForStudent(req, student.id);
+    res.json({ success: true, data });
+});
+
+/** Mobile app - student ki school bus / van ki jaankari. */
+export const studentTransport = asyncHandler(async (req, res) => {
+    const student = await assertAccess(req, req.params.studentId);
+    const data = await transportForStudent(req, student.id);
     res.json({ success: true, data });
 });

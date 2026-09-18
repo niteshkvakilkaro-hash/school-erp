@@ -13,6 +13,7 @@ import {
     Wallet,
     Megaphone,
     Library,
+    Bus,
     ShieldCheck,
     UserCog,
     Building2,
@@ -77,6 +78,7 @@ const SCHOOL_GROUPS = [
         title: 'Operations',
         items: [
             { to: '/library', label: 'Library', icon: Library, perm: ['library.view'] },
+            { to: '/transport', label: 'Transport', icon: Bus, perm: ['transport.view'] },
         ],
     },
     {

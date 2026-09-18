@@ -27,6 +27,7 @@ import { seedFees } from './_fees.js';
 import { seedTimetable } from './_timetable.js';
 import { seedNotices } from './_notices.js';
 import { seedLibrary } from './_library.js';
+import { seedTransport } from './_transport.js';
 
 const FORCE = process.argv.includes('--force');
 
@@ -361,6 +362,7 @@ async function run() {
         const ttStats = await seedTimetable(ctx.school);
         const noticeCount = await seedNotices(ctx.school, ctx.users);
         const libStats = await seedLibrary(ctx.school, ctx.users);
+        const trStats = await seedTransport(ctx.school);
 
         console.log(
             '[seed] ' + def.name + ' (' + def.code + '): ' +
@@ -382,6 +384,10 @@ async function run() {
         );
         console.log('         notices: ' + noticeCount);
         console.log('         library: ' + libStats.books + ' books, ' + libStats.issues + ' issues');
+        console.log(
+            '         transport: ' + trStats.vehicles + ' vehicles, ' + trStats.routes + ' routes, ' +
+            trStats.stops + ' stops, ' + trStats.riders + ' riders'
+        );
 
         lines.push('  ' + def.name + '  [' + def.code + ']');
         lines.push('    School Admin : ' + def.admin[1] + '  / admin123');

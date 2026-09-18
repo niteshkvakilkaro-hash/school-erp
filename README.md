@@ -52,6 +52,10 @@ chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
 | `notices` | Announcements - audience, category, publish/expiry dates |
 | `books` | Library catalogue - title, code, copies, shelf |
 | `book_issues` | Kaunsi book kise, kab tak, kab wapas aur kitna fine |
+| `vehicles` | School bus/van - reg no, seats, driver, helper, insurance |
+| `transport_routes` | Route - code, fare, kaunsa vehicle chalta hai |
+| `route_stops` | Route ke stops - pickup aur drop time |
+| `student_transport` | Kaunsa student kis route aur stop se (ek student = ek row) |
 
 ## Setup
 
@@ -103,6 +107,7 @@ badal sakta hai — ya apna naya role bana sakta hai.
 | Teacher | Students view/add/edit, attendance mark, homework, marks entry, apna timetable |
 | Accountant | Fees - heads, assign, collection aur reports |
 | Librarian | Library - books, issue, return aur fines |
+| Transport Manager | Vehicles, routes, stops aur students ko bus assign karna |
 | Student *(app)* | Apna record |
 | Parent *(app)* | Apne bachcho ka record |
 
@@ -132,7 +137,7 @@ API ka pata `mobile/.env` me set hota hai:
 Tabs: **Home** (bachche ka card, stats, teachers), **Attendance** (percent donut +
 day-wise history), **Fees** (paid/pending progress + head-wise breakup + receipts),
 **Notices** (category chips, tap karke poora padhiye) aur **More** (results,
-timetable, homework, library, profile, subjects, school info, logout).
+timetable, homework, library, transport (bus, stop timing, driver ko call), profile, subjects, school info, logout).
 Parent ke ek se zyada bachche hon to upar chips se child switch hota hai.
 
 App sirf parent/student roles ke liye khulta hai — staff login karega to login
@@ -191,11 +196,17 @@ GET    /library/books           POST/PUT/DELETE /library/books/:id
 GET    /library/issues          POST /library/issues
 POST   /library/issues/:id/return    POST /library/issues/:id/fine-paid
 
+GET    /transport/summary
+GET    /transport/vehicles      POST/PUT/DELETE /transport/vehicles/:id
+GET    /transport/routes        POST/PUT/DELETE /transport/routes/:id
+POST   /transport/routes/:id/stops   PUT/DELETE /transport/stops/:stopId
+GET    /transport/riders        POST /transport/riders   DELETE /transport/riders/:studentId
+
 --- Portal (mobile app) ---
 GET    /portal/me/students      GET /portal/school
 GET    /portal/students/:id     /subjects    /teachers
 GET    /portal/students/:id/attendance   /homework   /exams   /fees
-GET    /portal/students/:id/timetable    /notices   /library
+GET    /portal/students/:id/timetable    /notices   /library   /transport
 GET    /portal/students/:id/exams/:examId/result
 ```
 
@@ -240,6 +251,9 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 - Library: available copies store nahi hoti, issues se ginti hoti hain. Issue book row lock ke saath hota hai - do log ek saath aakhri copy nahi le sakte.
 - Ek student ke paas max 3 books, same book do baar nahi; total copies issued copies se kam nahi ki ja sakti.
 - Fine (Rs 2/din) due date ke baad chalta rehta hai aur return ke din freeze ho jata hai.
+- Transport: ek vehicle ek hi active route par; route ke students vehicle ki seats se zyada nahi ho sakte. Assign route row lock ke saath hota hai - aakhri seat par do log ek saath nahi aa sakte.
+- Stop usi route ka hona chahiye; student dusre route par assign karne se purana assignment shift ho jata hai (ek student = ek route).
+- Jis vehicle/route/stop par students hain wo delete nahi hota, aur vehicle ki capacity riders se kam nahi ki ja sakti.
 
 ## Useful commands
 
@@ -256,7 +270,8 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 Phase 1 me sirf core hai. Ye modules abhi baaki hain — models aur permission
 catalog aise banaye gaye hain ki ye seedha add ho jayenge:
 
-- Transport, Inventory
+- Inventory, Admissions workflow
+- Transport fee ko Fees module ke student fees me apne aap jodna
 - Homework submissions (abhi sirf assign hota hai, student upload nahi karta)
 
 ## Production notes

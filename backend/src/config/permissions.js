@@ -58,6 +58,9 @@ export const PERMISSIONS = [
     { slug: 'library.manage', module: 'Library', label: 'Books add / edit / delete' },
     { slug: 'library.issue', module: 'Library', label: 'Book issue aur return karna' },
 
+    { slug: 'transport.view', module: 'Transport', label: 'Routes, vehicles aur riders dekhna' },
+    { slug: 'transport.manage', module: 'Transport', label: 'Route, vehicle, stop banana aur students assign karna' },
+
     { slug: 'notices.view', module: 'Notices', label: 'Notices dekhna' },
     { slug: 'notices.manage', module: 'Notices', label: 'Notice banana / edit / delete' },
 
@@ -118,6 +121,7 @@ export const SYSTEM_ROLES = [
             'notices.view',
             'notices.manage',
             'library.view',
+            'transport.view',
             'attendance.view',
             'attendance.report',
             'homework.view',
@@ -165,6 +169,7 @@ export const SYSTEM_ROLES = [
             'sections.view',
             'attendance.view',
             'notices.view',
+            'transport.view',
             'fees.view',
             'fees.manage',
             'fees.collect',
@@ -185,6 +190,13 @@ export const SYSTEM_ROLES = [
             'library.manage',
             'library.issue',
         ],
+    },
+    {
+        slug: 'transport-manager',
+        name: 'Transport Manager',
+        scope: 'school',
+        description: 'Buses, routes, stops aur kaunsa student kis bus me',
+        permissions: ['dashboard.view', 'students.view', 'classes.view', 'notices.view', 'transport.view', 'transport.manage'],
     },
     {
         slug: 'student',

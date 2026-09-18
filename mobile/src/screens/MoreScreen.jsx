@@ -9,6 +9,7 @@ const ITEMS = [
     { key: 'Timetable', icon: '📅', label: 'Timetable', sub: 'Din ke hisaab se classes' },
     { key: 'Homework', icon: '📝', label: 'Homework', sub: 'Pending aur overdue assignments' },
     { key: 'Library', icon: '📚', label: 'Library', sub: 'Issued books, due date aur fine' },
+    { key: 'Transport', icon: '\u{1F68C}', label: 'Transport', sub: 'Bus, stop timing aur driver ka number' },
     { key: 'Profile', icon: '\u{1F464}', label: 'Student profile', sub: 'Poori details aur guardian info' },
     { key: 'Subjects', icon: '\u{1F4DA}', label: 'Subjects', sub: 'Class ke subjects aur teachers' },
     { key: 'School', icon: '\u{1F3EB}', label: 'School info', sub: 'Address, contact aur session' },
