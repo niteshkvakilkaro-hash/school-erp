@@ -23,6 +23,8 @@ import FeePayment from './FeePayment.js';
 import Period from './Period.js';
 import TimetableSlot from './TimetableSlot.js';
 import Notice from './Notice.js';
+import Book from './Book.js';
+import BookIssue from './BookIssue.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -31,7 +33,7 @@ import Notice from './Notice.js';
 const TENANT_MODELS = [
     User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject,
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
-    FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice,
+    FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice, Book, BookIssue,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -181,6 +183,16 @@ Notice.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
 Notice.belongsTo(Section, { foreignKey: 'sectionId', as: 'section' });
 Notice.belongsTo(User, { foreignKey: 'createdById', as: 'createdBy' });
 
+/* ---------------- Library ---------------- */
+
+Book.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
+Book.hasMany(BookIssue, { foreignKey: 'bookId', as: 'issues', onDelete: 'CASCADE' });
+BookIssue.belongsTo(Book, { foreignKey: 'bookId', as: 'book' });
+BookIssue.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+Student.hasMany(BookIssue, { foreignKey: 'studentId', as: 'bookIssues', onDelete: 'CASCADE' });
+BookIssue.belongsTo(User, { foreignKey: 'userId', as: 'borrower' });
+BookIssue.belongsTo(User, { foreignKey: 'issuedById', as: 'issuedBy' });
+
 export {
     sequelize,
     School,
@@ -207,4 +219,6 @@ export {
     Period,
     TimetableSlot,
     Notice,
+    Book,
+    BookIssue,
 };

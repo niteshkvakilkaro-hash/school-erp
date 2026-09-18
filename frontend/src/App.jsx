@@ -17,6 +17,7 @@ import Homework from '@/pages/Homework';
 import Exams from '@/pages/Exams';
 import Fees from '@/pages/Fees';
 import Notices from '@/pages/Notices';
+import LibraryPage from '@/pages/Library';
 import Users from '@/pages/Users';
 import Roles from '@/pages/Roles';
 import SchoolSettings from '@/pages/SchoolSettings';
@@ -156,6 +157,14 @@ export default function App() {
                                 element={
                                     <ProtectedRoute permissions={['fees.view']}>
                                         <Fees />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="library"
+                                element={
+                                    <ProtectedRoute permissions={['library.view']}>
+                                        <LibraryPage />
                                     </ProtectedRoute>
                                 }
                             />

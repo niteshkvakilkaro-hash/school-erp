@@ -7,6 +7,7 @@ import { studentResult } from './exam.controller.js';
 import { forStudent as feesForStudent } from './fee.controller.js';
 import { forStudent as timetableForStudent } from './timetable.controller.js';
 import { forStudent as noticesForStudent } from './notice.controller.js';
+import { forStudent as libraryForStudent } from './library.controller.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
@@ -251,4 +252,11 @@ export const studentNotices = asyncHandler(async (req, res) => {
     const student = await assertAccess(req, req.params.studentId);
     const items = await noticesForStudent(req, student);
     res.json({ success: true, data: items });
+});
+
+/** Mobile app - student ke paas kaunsi library books hain. */
+export const studentLibrary = asyncHandler(async (req, res) => {
+    const student = await assertAccess(req, req.params.studentId);
+    const data = await libraryForStudent(req, student.id);
+    res.json({ success: true, data });
 });

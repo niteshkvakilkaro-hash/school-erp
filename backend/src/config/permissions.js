@@ -54,6 +54,10 @@ export const PERMISSIONS = [
     { slug: 'fees.collect', module: 'Fees', label: 'Payment lena aur receipt banana' },
     { slug: 'fees.report', module: 'Fees', label: 'Collection reports dekhna' },
 
+    { slug: 'library.view', module: 'Library', label: 'Library books dekhna' },
+    { slug: 'library.manage', module: 'Library', label: 'Books add / edit / delete' },
+    { slug: 'library.issue', module: 'Library', label: 'Book issue aur return karna' },
+
     { slug: 'notices.view', module: 'Notices', label: 'Notices dekhna' },
     { slug: 'notices.manage', module: 'Notices', label: 'Notice banana / edit / delete' },
 
@@ -113,6 +117,7 @@ export const SYSTEM_ROLES = [
             'timetable.view',
             'notices.view',
             'notices.manage',
+            'library.view',
             'attendance.view',
             'attendance.report',
             'homework.view',
@@ -138,6 +143,7 @@ export const SYSTEM_ROLES = [
             'timetable.view',
             'notices.view',
             'notices.manage',
+            'library.view',
             'attendance.view',
             'attendance.mark',
             'attendance.report',
@@ -163,6 +169,21 @@ export const SYSTEM_ROLES = [
             'fees.manage',
             'fees.collect',
             'fees.report',
+        ],
+    },
+    {
+        slug: 'librarian',
+        name: 'Librarian',
+        scope: 'school',
+        description: 'Library - books, issue, return aur fines',
+        permissions: [
+            'dashboard.view',
+            'students.view',
+            'classes.view',
+            'notices.view',
+            'library.view',
+            'library.manage',
+            'library.issue',
         ],
     },
     {

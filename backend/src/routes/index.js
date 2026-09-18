@@ -16,6 +16,7 @@ import examRoutes from './exam.routes.js';
 import feeRoutes from './fee.routes.js';
 import timetableRoutes from './timetable.routes.js';
 import noticeRoutes from './notice.routes.js';
+import libraryRoutes from './library.routes.js';
 import { authenticate, resolveTenant, requireTenant, can } from '../middleware/auth.js';
 import { stats } from '../controllers/dashboard.controller.js';
 
@@ -56,5 +57,6 @@ router.use('/exams', examRoutes);
 router.use('/fees', feeRoutes);
 router.use('/timetable', timetableRoutes);
 router.use('/notices', noticeRoutes);
+router.use('/library', libraryRoutes);
 
 export default router;

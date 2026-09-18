@@ -26,6 +26,7 @@ import { seedAttendance, seedHomework, seedExams } from './_academics.js';
 import { seedFees } from './_fees.js';
 import { seedTimetable } from './_timetable.js';
 import { seedNotices } from './_notices.js';
+import { seedLibrary } from './_library.js';
 
 const FORCE = process.argv.includes('--force');
 
@@ -359,6 +360,7 @@ async function run() {
         const feeStats = await seedFees(ctx.school, ctx.users);
         const ttStats = await seedTimetable(ctx.school);
         const noticeCount = await seedNotices(ctx.school, ctx.users);
+        const libStats = await seedLibrary(ctx.school, ctx.users);
 
         console.log(
             '[seed] ' + def.name + ' (' + def.code + '): ' +
@@ -379,6 +381,7 @@ async function run() {
             ' slots (' + ttStats.withTeacher + ' with teacher)'
         );
         console.log('         notices: ' + noticeCount);
+        console.log('         library: ' + libStats.books + ' books, ' + libStats.issues + ' issues');
 
         lines.push('  ' + def.name + '  [' + def.code + ']');
         lines.push('    School Admin : ' + def.admin[1] + '  / admin123');

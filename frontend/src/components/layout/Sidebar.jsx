@@ -12,6 +12,7 @@ import {
     FileSpreadsheet,
     Wallet,
     Megaphone,
+    Library,
     ShieldCheck,
     UserCog,
     Building2,
@@ -70,6 +71,12 @@ const SCHOOL_GROUPS = [
         title: 'Finance',
         items: [
             { to: '/fees', label: 'Fees & Payments', icon: Wallet, perm: ['fees.view'] },
+        ],
+    },
+    {
+        title: 'Operations',
+        items: [
+            { to: '/library', label: 'Library', icon: Library, perm: ['library.view'] },
         ],
     },
     {
