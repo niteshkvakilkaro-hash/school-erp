@@ -56,6 +56,8 @@ chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
 | `transport_routes` | Route - code, fare, kaunsa vehicle chalta hai |
 | `route_stops` | Route ke stops - pickup aur drop time |
 | `student_transport` | Kaunsa student kis route aur stop se (ek student = ek row) |
+| `admissions` | Enquiry / application - bachcha, parents, class, source, stage, follow-up, interview |
+| `admission_logs` | Har application ki timeline - stage badla ya note, kisne aur kab |
 
 ## Setup
 
@@ -108,6 +110,7 @@ badal sakta hai — ya apna naya role bana sakta hai.
 | Accountant | Fees - heads, assign, collection aur reports |
 | Librarian | Library - books, issue, return aur fines |
 | Transport Manager | Vehicles, routes, stops aur students ko bus assign karna |
+| Front Office | Admission enquiries, follow-up, interview (admit nahi kar sakte) |
 | Student *(app)* | Apna record |
 | Parent *(app)* | Apne bachcho ka record |
 
@@ -196,6 +199,10 @@ GET    /library/books           POST/PUT/DELETE /library/books/:id
 GET    /library/issues          POST /library/issues
 POST   /library/issues/:id/return    POST /library/issues/:id/fine-paid
 
+GET    /admissions/summary      GET /admissions/seats/:classId
+GET    /admissions              POST /admissions   GET/PUT/DELETE /admissions/:id
+POST   /admissions/:id/status   POST /admissions/:id/notes   POST /admissions/:id/admit
+
 GET    /transport/summary
 GET    /transport/vehicles      POST/PUT/DELETE /transport/vehicles/:id
 GET    /transport/routes        POST/PUT/DELETE /transport/routes/:id
@@ -251,6 +258,10 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 - Library: available copies store nahi hoti, issues se ginti hoti hain. Issue book row lock ke saath hota hai - do log ek saath aakhri copy nahi le sakte.
 - Ek student ke paas max 3 books, same book do baar nahi; total copies issued copies se kam nahi ki ja sakti.
 - Fine (Rs 2/din) due date ke baad chalta rehta hai aur return ke din freeze ho jata hai.
+- Admission stages: enquiry → applied → interview → approved → admitted. Stage skip nahi hota; reject/withdraw ke liye reason zaroori, aur band application reopen ho sakti hai.
+- Sirf approved application admit hoti hai. Admit par application, section aur school row lock hote hain - ek application se ek hi student banta hai, section ki capacity aur plan ki student limit par race nahi hoti.
+- Admitted application edit/delete nahi hoti. Same bachche (naam + phone + class) ki doosri khuli enquiry nahi banti.
+- Plan ki `maxStudents` limit ab student create, inactive → active aur admission teeno par lagti hai (0 = unlimited).
 - Transport: ek vehicle ek hi active route par; route ke students vehicle ki seats se zyada nahi ho sakte. Assign route row lock ke saath hota hai - aakhri seat par do log ek saath nahi aa sakte.
 - Stop usi route ka hona chahiye; student dusre route par assign karne se purana assignment shift ho jata hai (ek student = ek route).
 - Jis vehicle/route/stop par students hain wo delete nahi hota, aur vehicle ki capacity riders se kam nahi ki ja sakti.
@@ -272,7 +283,8 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 Phase 1 me sirf core hai. Ye modules abhi baaki hain — models aur permission
 catalog aise banaye gaye hain ki ye seedha add ho jayenge:
 
-- Inventory, Admissions workflow
+- Inventory
+- Website par public admission enquiry form (abhi enquiry school staff hi darj karta hai)
 - Transport fee ko Fees module ke student fees me apne aap jodna
 - Homework submissions (abhi sirf assign hota hai, student upload nahi karta)
 

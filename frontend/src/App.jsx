@@ -19,6 +19,7 @@ import Fees from '@/pages/Fees';
 import Notices from '@/pages/Notices';
 import LibraryPage from '@/pages/Library';
 import TransportPage from '@/pages/Transport';
+import AdmissionsPage from '@/pages/Admissions';
 import Users from '@/pages/Users';
 import Roles from '@/pages/Roles';
 import SchoolSettings from '@/pages/SchoolSettings';
@@ -174,6 +175,14 @@ export default function App() {
                                 element={
                                     <ProtectedRoute permissions={['transport.view']}>
                                         <TransportPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="admissions"
+                                element={
+                                    <ProtectedRoute permissions={['admissions.view']}>
+                                        <AdmissionsPage />
                                     </ProtectedRoute>
                                 }
                             />

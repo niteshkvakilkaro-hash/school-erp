@@ -18,6 +18,7 @@ import timetableRoutes from './timetable.routes.js';
 import noticeRoutes from './notice.routes.js';
 import libraryRoutes from './library.routes.js';
 import transportRoutes from './transport.routes.js';
+import admissionRoutes from './admission.routes.js';
 import { authenticate, resolveTenant, requireTenant, can } from '../middleware/auth.js';
 import { stats } from '../controllers/dashboard.controller.js';
 
@@ -47,6 +48,7 @@ router.get(
 router.use('/school', schoolRoutes);
 router.use('/roles', roleRoutes);
 router.use('/users', userRoutes);
+router.use('/admissions', admissionRoutes);
 router.use('/students', studentRoutes);
 router.use('/teachers', teacherRoutes);
 router.use('/classes', classRoutes);

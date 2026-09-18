@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
     LayoutDashboard,
     GraduationCap,
+    ClipboardList,
     Users,
     School,
     Layers3,
@@ -52,6 +53,7 @@ const SCHOOL_GROUPS = [
         title: 'People',
         items: [
             { to: '/students', label: 'Students', icon: GraduationCap, perm: ['students.view'] },
+            { to: '/admissions', label: 'Admissions', icon: ClipboardList, perm: ['admissions.view'] },
             { to: '/teachers', label: 'Teachers', icon: Users, perm: ['teachers.view'] },
             { to: '/users', label: 'Staff & Parents', icon: UserCog, perm: ['users.view', 'users.manage'] },
         ],

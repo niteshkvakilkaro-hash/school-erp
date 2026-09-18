@@ -19,6 +19,10 @@ export const PERMISSIONS = [
     { slug: 'students.update', module: 'Students', label: 'Student edit karna' },
     { slug: 'students.delete', module: 'Students', label: 'Student delete karna' },
 
+    { slug: 'admissions.view', module: 'Admissions', label: 'Enquiries aur applications dekhna' },
+    { slug: 'admissions.manage', module: 'Admissions', label: 'Enquiry banana, stage badalna, notes/follow-up' },
+    { slug: 'admissions.admit', module: 'Admissions', label: 'Approved application ko student banana' },
+
     { slug: 'teachers.view', module: 'Teachers', label: 'Teachers dekhna' },
     { slug: 'teachers.create', module: 'Teachers', label: 'Teacher add karna' },
     { slug: 'teachers.update', module: 'Teachers', label: 'Teacher edit karna' },
@@ -110,6 +114,9 @@ export const SYSTEM_ROLES = [
             'dashboard.view',
             'students.view',
             'students.update',
+            'admissions.view',
+            'admissions.manage',
+            'admissions.admit',
             'teachers.view',
             'classes.view',
             'sections.view',
@@ -197,6 +204,21 @@ export const SYSTEM_ROLES = [
         scope: 'school',
         description: 'Buses, routes, stops aur kaunsa student kis bus me',
         permissions: ['dashboard.view', 'students.view', 'classes.view', 'notices.view', 'transport.view', 'transport.manage'],
+    },
+    {
+        slug: 'front-office',
+        name: 'Front Office',
+        scope: 'school',
+        description: 'Admission enquiries, follow-up aur interview schedule',
+        permissions: [
+            'dashboard.view',
+            'students.view',
+            'classes.view',
+            'sections.view',
+            'notices.view',
+            'admissions.view',
+            'admissions.manage',
+        ],
     },
     {
         slug: 'student',

@@ -5,6 +5,7 @@ import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { getPagination, paginated } from '../utils/pagination.js';
 import { scopedWhere, findScoped, assertSameTenant } from '../utils/tenant.js';
+import { assertStudentSeat } from '../utils/planLimits.js';
 
 const emptyToNull = (v) => (v === '' || v === undefined ? null : v);
 
@@ -173,6 +174,7 @@ export const create = asyncHandler(async (req, res) => {
     }
 
     const student = await sequelize.transaction(async (t) => {
+        if (profile.status === 'active') await assertStudentSeat(req, t);
         let userId = null;
         if (createLogin) {
             const user = await User.create(
@@ -210,6 +212,8 @@ export const update = asyncHandler(async (req, res) => {
     let transportFreed = 0;
 
     await sequelize.transaction(async (t) => {
+        // Inactive/alumni ko wapas active karna bhi plan ki ek seat leta hai
+        if (profile.status === 'active' && student.status !== 'active') await assertStudentSeat(req, t);
         await student.update(profile, { transaction: t });
 
         // School chhod diya ya inactive hua to bus ki seat khali kar do

@@ -29,6 +29,8 @@ import Vehicle from './Vehicle.js';
 import TransportRoute from './TransportRoute.js';
 import RouteStop from './RouteStop.js';
 import StudentTransport from './StudentTransport.js';
+import Admission from './Admission.js';
+import AdmissionLog from './AdmissionLog.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -38,7 +40,7 @@ const TENANT_MODELS = [
     User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject,
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
     FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice, Book, BookIssue,
-    Vehicle, TransportRoute, RouteStop, StudentTransport,
+    Vehicle, TransportRoute, RouteStop, StudentTransport, Admission, AdmissionLog,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -211,6 +213,15 @@ RouteStop.hasMany(StudentTransport, { foreignKey: 'stopId', as: 'riders' });
 StudentTransport.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
 Student.hasOne(StudentTransport, { foreignKey: 'studentId', as: 'transport', onDelete: 'CASCADE' });
 
+/* ---------------- Admissions ---------------- */
+
+Admission.belongsTo(SchoolClass, { foreignKey: 'classId', as: 'schoolClass' });
+Admission.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+Admission.belongsTo(User, { foreignKey: 'createdById', as: 'createdBy' });
+Admission.hasMany(AdmissionLog, { foreignKey: 'admissionId', as: 'logs', onDelete: 'CASCADE' });
+AdmissionLog.belongsTo(Admission, { foreignKey: 'admissionId', as: 'admission' });
+AdmissionLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
 export {
     sequelize,
     School,
@@ -243,4 +254,6 @@ export {
     TransportRoute,
     RouteStop,
     StudentTransport,
+    Admission,
+    AdmissionLog,
 };
