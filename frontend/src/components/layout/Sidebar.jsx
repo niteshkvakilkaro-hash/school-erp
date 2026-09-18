@@ -21,6 +21,8 @@ import {
     CreditCard,
     Settings,
     Globe,
+    UserCheck,
+    CalendarOff,
     X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -57,6 +59,13 @@ const SCHOOL_GROUPS = [
             { to: '/admissions', label: 'Admissions', icon: ClipboardList, perm: ['admissions.view'] },
             { to: '/teachers', label: 'Teachers', icon: Users, perm: ['teachers.view'] },
             { to: '/users', label: 'Staff & Parents', icon: UserCog, perm: ['users.view', 'users.manage'] },
+        ],
+    },
+    {
+        title: 'HR',
+        items: [
+            { to: '/staff-attendance', label: 'Staff attendance', icon: UserCheck, perm: ['hr.view'] },
+            { to: '/leaves', label: 'Leaves', icon: CalendarOff, perm: ['hr.view'] },
         ],
     },
     {

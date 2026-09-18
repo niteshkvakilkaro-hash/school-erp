@@ -89,3 +89,30 @@ export async function removeFiles(...urls) {
         await fs.unlink(abs).catch(() => {});
     }
 }
+
+/* ---------------- Private photos (attendance selfies) ---------------- */
+
+/** backend/private - static serve NAHI hota, sirf permission check ke baad API se. */
+export const PRIVATE_ROOT = fileURLToPath(new URL('../../private', import.meta.url));
+
+/** Selfie chhoti WebP ban kar private folder me; wapas relative key milti hai. */
+export async function savePrivateImage(buffer, schoolId, folder) {
+    try {
+        await sharp(buffer, { failOn: 'error' }).metadata();
+    } catch {
+        throw ApiError.badRequest('Selfie sahi photo nahi hai');
+    }
+    const key = folder + '/' + schoolId + '/' + crypto.randomUUID() + '.webp';
+    const abs = path.join(PRIVATE_ROOT, key);
+    await fs.mkdir(path.dirname(abs), { recursive: true });
+    const out = await sharp(buffer).rotate().resize({ width: 640, height: 640, fit: 'inside', withoutEnlargement: true }).webp({ quality: 75 }).toBuffer();
+    await fs.writeFile(abs, out);
+    return key;
+}
+
+/** Key se absolute path - folder ke bahar jaane wala key reject. */
+export function privatePath(key) {
+    if (!key) return null;
+    const abs = path.resolve(PRIVATE_ROOT, key);
+    return abs.startsWith(PRIVATE_ROOT + path.sep) ? abs : null;
+}

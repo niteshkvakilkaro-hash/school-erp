@@ -27,6 +27,21 @@
     "web": {
       "bundler": "metro"
     },
-    "extra": {}
+    "extra": {},
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Attendance ke liye selfie lene ko camera chahiye.",
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Attendance lagate waqt aap school me hain ya nahi, ye dekhne ke liye location chahiye."
+        }
+      ]
+    ]
   }
 }

@@ -33,6 +33,9 @@ import Admission from './Admission.js';
 import AdmissionLog from './AdmissionLog.js';
 import SchoolSite from './SchoolSite.js';
 import SiteMedia from './SiteMedia.js';
+import HrSetting from './HrSetting.js';
+import StaffAttendance from './StaffAttendance.js';
+import LeaveRequest from './LeaveRequest.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -43,6 +46,7 @@ const TENANT_MODELS = [
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
     FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice, Book, BookIssue,
     Vehicle, TransportRoute, RouteStop, StudentTransport, Admission, AdmissionLog, SchoolSite, SiteMedia,
+    HrSetting, StaffAttendance, LeaveRequest,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -227,6 +231,15 @@ AdmissionLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 School.hasOne(SchoolSite, { foreignKey: 'schoolId', as: 'site' });
 School.hasMany(SiteMedia, { foreignKey: 'schoolId', as: 'media' });
 
+/* ---------------- HR ---------------- */
+
+StaffAttendance.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+StaffAttendance.belongsTo(User, { foreignKey: 'markedById', as: 'markedBy' });
+User.hasMany(StaffAttendance, { foreignKey: 'userId', as: 'staffAttendance', onDelete: 'CASCADE' });
+LeaveRequest.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+LeaveRequest.belongsTo(User, { foreignKey: 'reviewedById', as: 'reviewedBy' });
+User.hasMany(LeaveRequest, { foreignKey: 'userId', as: 'leaves', onDelete: 'CASCADE' });
+
 export {
     sequelize,
     School,
@@ -263,4 +276,7 @@ export {
     AdmissionLog,
     SchoolSite,
     SiteMedia,
+    HrSetting,
+    StaffAttendance,
+    LeaveRequest,
 };

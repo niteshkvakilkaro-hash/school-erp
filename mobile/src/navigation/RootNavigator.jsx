@@ -19,11 +19,19 @@ import MoreScreen from '../screens/MoreScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import SubjectsScreen from '../screens/SubjectsScreen';
 import SchoolScreen from '../screens/SchoolScreen';
+import StaffHomeScreen from '../screens/staff/StaffHomeScreen';
+import CheckInScreen from '../screens/staff/CheckInScreen';
+import ClassAttendanceScreen from '../screens/staff/ClassAttendanceScreen';
+import LeavesScreen from '../screens/staff/LeavesScreen';
+import StaffMoreScreen from '../screens/staff/StaffMoreScreen';
+import MyAttendanceScreen from '../screens/staff/MyAttendanceScreen';
+import StaffTimetableScreen from '../screens/staff/StaffTimetableScreen';
 import { Loader } from '../components/ui';
 
 const Stack = createNativeStackNavigator();
 const MoreStack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const StaffStack = createNativeStackNavigator();
 
 // Emoji icons - koi extra icon package install karne ki zaroorat nahi padti
 const ICONS = {
@@ -32,6 +40,8 @@ const ICONS = {
     Fees: '\u{1F4B0}',
     Notices: '\u{1F4E2}',
     More: '\u{2630}',
+    Class: '\u{1F4DD}',
+    Leaves: '\u{1F334}',
 };
 
 /** "More" tab ke andar ka stack - kam use hone wale screens. */
@@ -91,8 +101,51 @@ function Tabs() {
     );
 }
 
+/** Teacher / staff ke tabs - apni attendance, class ki attendance, leave. */
+function StaffTabs() {
+    const { colors } = useTheme();
+    const { can } = useAuth();
+    return (
+        <Tab.Navigator
+            screenOptions={({ route }) => ({
+                headerShown: false,
+                tabBarActiveTintColor: colors.primary,
+                tabBarInactiveTintColor: colors.mutedForeground,
+                tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border, height: 76, paddingBottom: 14, paddingTop: 8 },
+                tabBarLabelStyle: { fontSize: 11, fontWeight: '500', lineHeight: 15, marginTop: 2 },
+                tabBarIcon: ({ focused }) => (
+                    <Text style={{ fontSize: 18, lineHeight: 22, opacity: focused ? 1 : 0.55 }}>{ICONS[route.name]}</Text>
+                ),
+            })}
+        >
+            <Tab.Screen name="Home" component={StaffHomeScreen} />
+            {can('attendance.mark') ? <Tab.Screen name="Class" component={ClassAttendanceScreen} /> : null}
+            <Tab.Screen name="Leaves" component={LeavesScreen} />
+            <Tab.Screen name="More" component={StaffMoreScreen} />
+        </Tab.Navigator>
+    );
+}
+
+function StaffRoot() {
+    const { colors } = useTheme();
+    return (
+        <StaffStack.Navigator
+            screenOptions={{ headerStyle: { backgroundColor: colors.card }, headerTintColor: colors.foreground, headerTitleStyle: { fontSize: 16 }, headerBackTitle: 'Back' }}
+        >
+            <StaffStack.Screen name="StaffTabs" component={StaffTabs} options={{ headerShown: false, title: 'Home' }} />
+            <StaffStack.Screen
+                name="CheckIn"
+                component={CheckInScreen}
+                options={({ route }) => ({ title: route.params?.mode === 'out' ? 'Check-out' : 'Check-in' })}
+            />
+            <StaffStack.Screen name="MyAttendance" component={MyAttendanceScreen} options={{ title: 'Meri attendance' }} />
+            <StaffStack.Screen name="StaffTimetable" component={StaffTimetableScreen} options={{ title: 'Mera timetable' }} />
+        </StaffStack.Navigator>
+    );
+}
+
 export function RootNavigator() {
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, loading, mode } = useAuth();
     const { colors, scheme } = useTheme();
 
     const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
@@ -113,7 +166,9 @@ export function RootNavigator() {
     return (
         <NavigationContainer theme={navTheme}>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-                {isAuthenticated ? (
+                {isAuthenticated && mode === 'staff' ? (
+                    <Stack.Screen name="Staff" component={StaffRoot} />
+                ) : isAuthenticated ? (
                     <Stack.Screen name="App">
                         {() => (
                             <StudentProvider>

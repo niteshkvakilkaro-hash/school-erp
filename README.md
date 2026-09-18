@@ -59,6 +59,9 @@ chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
 | `admissions` | Enquiry / application - bachcha, parents, class, source, stage, follow-up, interview |
 | `admission_logs` | Har application ki timeline - stage badla ya note, kisne aur kab |
 | `school_sites` | School ki public website - theme, hero, about, principal, highlights, facilities, videos, reviews, FAQ, socials, publish |
+| `hr_settings` | School ki HR policy - GPS point, radius, timing, late ki chhoot, half-day, weekly off, selfie/location rules |
+| `staff_attendance` | Staff ki roz ki attendance - check-in/out ka server time, GPS, school se doori, bahar/mock flag, selfie (private) |
+| `leave_requests` | Staff ki leave - type, dates, din, reason, approve/reject |
 | `site_media` | Website ki photos - slider, gallery (albums), logo, principal photo. File `backend/uploads/schools/<id>/` me |
 
 ## Setup
@@ -113,6 +116,8 @@ badal sakta hai — ya apna naya role bana sakta hai.
 | Librarian | Library - books, issue, return aur fines |
 | Transport Manager | Vehicles, routes, stops aur students ko bus assign karna |
 | Front Office | Admission enquiries, follow-up, interview (admit nahi kar sakte) |
+
+Har staff role (teacher, accountant, librarian, transport, front office, principal) ke paas `hr.self` hai - app se apni attendance aur leave. Live panel / register / leave approve: school admin aur principal (`hr.view`, `hr.manage`).
 | Student *(app)* | Apna record |
 | Parent *(app)* | Apne bachcho ka record |
 
@@ -147,6 +152,25 @@ Admin panel me **Settings → Website** se:
 
 Website ka code alag chunk me load hota hai - visitor ko admin ERP ka code download nahi karna padta.
 
+## Staff attendance & HR
+
+**Staff app** (wahi Expo app - teacher/staff login par staff screens khulti hain):
+- **Check-in / check-out** - front camera se selfie + GPS. Time **server** ka lagta hai (phone ki ghadi se farak nahi), school ke point se doori naapi jaati hai, campus ke bahar aur Android ki *mock location* flag hoti hai. HR settings me "bahar se rok do" chalu ho to wahin mana.
+- Late (school time + chhoot ke baad), kam ghante par half-day - apne aap.
+- **Class attendance** - class teacher apne section ki hazri (P/A/L/H) app se.
+- **Leave** apply / cancel, apni mahine ki attendance, apna timetable.
+
+**Admin panel → HR:**
+- **Staff attendance → Live** - aaj kaun aaya, kab, kitni door se, selfie; har 30 sec refresh; filters (late, nahi aaye, flags); detail me dono selfie + map; haath se status badalna (note zaroori, register me nishan).
+- **Monthly register** - staff x din grid (P/L/H/A/LV), totals, CSV (Excel) download.
+- **HR settings** - "Meri location use kariye" se school ka GPS point, radius, timing, weekly off, rules.
+- **Leaves** - pending pehle, approve / reject (reject ke liye reason); apni leave khud approve nahi.
+
+Selfie `backend/private/` me rehti hai - static serve **nahi** hoti; sirf HR dekhne wala ya wahi staff API se dekh sakta hai.
+
+> Face *matching* (selfie asli usi insaan ki hai ya nahi) abhi nahi hai - admin selfie dekh kar verify karta hai.
+> Iske liye AWS Rekognition / Azure Face jaisi service jodni padegi.
+
 ## Mobile app (Expo)
 
 ```bash
@@ -163,7 +187,9 @@ dena zaroori hai (`mobile/eas.json` me profile ke hisaab se).
 
 1. Laptop aur phone ek hi WiFi par hon.
 2. Root folder me: `npm run dev:phone` (API + admin panel + app, sab LAN par).
-3. Phone ke browser me: `http://<laptop-IP>:8081` - app (parent/student login).
+3. Phone ke browser me: `http://<laptop-IP>:8081` - app (parent/student/teacher login).
+   Browser me camera aur GPS sirf HTTPS par chalte hain - selfie check-in test karne ke liye Expo Go / APK use kijiye,
+   ya Android Chrome me `chrome://flags/#unsafely-treat-insecure-origin-as-secure` me `http://<laptop-IP>:8081` jod dijiye.
    Website: `http://<laptop-IP>:5173/site/sunrise-public-school`.
 4. Windows pehli baar "Allow access" pooche to **Private network** allow kijiye. Na pooche aur phone
    se na khule to Admin PowerShell me:
@@ -338,7 +364,8 @@ catalog aise banaye gaye hain ki ye seedha add ho jayenge:
 
 ## Production notes
 
-- `backend/uploads/` me schools ki photos hain - git me nahi jaati. Server par is folder ko persistent disk / backup me rakhiye.
+- `backend/uploads/` (website photos) aur `backend/private/` (attendance selfies) git me nahi jaate - server par dono ko persistent disk / backup me rakhiye.
+- School ka timezone `SCHOOL_TZ` env se (default `Asia/Kolkata`) - attendance ki date aur late isi se.
 
 - `backend/.env` me `JWT_SECRET` zaroor badliye, `NODE_ENV=production` set kijiye.
 - `CLIENT_URL` comma se alag karke kai origins le leta hai (web panel + Expo web dev).

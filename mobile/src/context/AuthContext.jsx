@@ -4,6 +4,13 @@ import api, { TOKEN_KEY, setUnauthorizedHandler } from '../lib/api';
 
 const AuthContext = createContext(null);
 
+/** 'family' = parent/student screens, 'staff' = teacher/staff screens. */
+export function modeFor(perms = []) {
+    if (perms.includes('portal.self.view') || perms.includes('portal.child.view')) return 'family';
+    if (perms.includes('hr.self')) return 'staff';
+    return null;
+}
+
 export function AuthProvider({ children }) {
     const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -42,16 +49,13 @@ export function AuthProvider({ children }) {
 
         const { data } = await api.post('/auth/login', body);
 
-        // Ye app sirf parent aur student ke liye hai. Staff ko andar ghusne dene se
-        // wo har screen par 403 dekhta - isliye yahin saaf message de dete hain.
-        const perms = data.data.permissions || [];
-        const canUseApp = perms.includes('portal.self.view') || perms.includes('portal.child.view');
-        if (!canUseApp) {
+        // App parent/student (portal) aur staff (apni attendance - hr.self) ke liye hai.
+        // Jiske paas dono me se kuch nahi, use yahin saaf message.
+        if (!modeFor(data.data.permissions)) {
             throw {
                 message:
-                    'Ye app sirf parents aur students ke liye hai. ' +
                     (data.data.user?.role?.name || 'Aapka role') +
-                    ' ke liye web admin panel use kijiye.',
+                    ' ke liye app me kuch nahi hai - web admin panel use kijiye.',
             };
         }
 
@@ -65,6 +69,9 @@ export function AuthProvider({ children }) {
             session,
             user: session?.user || null,
             school: session?.school || null,
+            permissions: session?.permissions || [],
+            mode: modeFor(session?.permissions),
+            can: (p) => (session?.permissions || []).includes(p),
             loading,
             login,
             logout,

@@ -79,6 +79,10 @@ export const PERMISSIONS = [
 
     { slug: 'website.manage', module: 'Website', label: 'School website ka content aur theme badalna' },
 
+    { slug: 'hr.self', module: 'HR', label: 'App se apni attendance (selfie + location) aur leave' },
+    { slug: 'hr.view', module: 'HR', label: 'Staff ki live attendance, register aur leaves dekhna' },
+    { slug: 'hr.manage', module: 'HR', label: 'Attendance sudharna, leave approve karna, HR settings' },
+
     // ---- Portal (mobile app) ----
     { slug: 'portal.self.view', module: 'Portal', label: 'Apna student record dekhna' },
     { slug: 'portal.child.view', module: 'Portal', label: 'Apne bachche ka record dekhna' },
@@ -112,7 +116,7 @@ export const SYSTEM_ROLES = [
         name: 'Principal',
         scope: 'school',
         description: 'Sab kuch dekh sakte hain, students edit kar sakte hain',
-        permissions: [
+        permissions: ['hr.self', 'hr.view', 'hr.manage', 
             'dashboard.view',
             'students.view',
             'students.update',
@@ -146,7 +150,7 @@ export const SYSTEM_ROLES = [
         name: 'Teacher',
         scope: 'school',
         description: 'Apni classes ke students aur academics',
-        permissions: [
+        permissions: ['hr.self', 
             'dashboard.view',
             'students.view',
             'students.create',
@@ -172,7 +176,7 @@ export const SYSTEM_ROLES = [
         name: 'Accountant',
         scope: 'school',
         description: 'Fees collection, dues aur reports',
-        permissions: [
+        permissions: ['hr.self', 
             'dashboard.view',
             'students.view',
             'classes.view',
@@ -191,7 +195,7 @@ export const SYSTEM_ROLES = [
         name: 'Librarian',
         scope: 'school',
         description: 'Library - books, issue, return aur fines',
-        permissions: [
+        permissions: ['hr.self', 
             'dashboard.view',
             'students.view',
             'classes.view',
@@ -206,14 +210,14 @@ export const SYSTEM_ROLES = [
         name: 'Transport Manager',
         scope: 'school',
         description: 'Buses, routes, stops aur kaunsa student kis bus me',
-        permissions: ['dashboard.view', 'students.view', 'classes.view', 'notices.view', 'transport.view', 'transport.manage'],
+        permissions: ['hr.self', 'dashboard.view', 'students.view', 'classes.view', 'notices.view', 'transport.view', 'transport.manage'],
     },
     {
         slug: 'front-office',
         name: 'Front Office',
         scope: 'school',
         description: 'Admission enquiries, follow-up aur interview schedule',
-        permissions: [
+        permissions: ['hr.self', 
             'dashboard.view',
             'students.view',
             'classes.view',

@@ -21,6 +21,8 @@ import LibraryPage from '@/pages/Library';
 import TransportPage from '@/pages/Transport';
 import AdmissionsPage from '@/pages/Admissions';
 import WebsiteSettings from '@/pages/WebsiteSettings';
+import StaffAttendance from '@/pages/StaffAttendance';
+import LeavesPage from '@/pages/Leaves';
 import Users from '@/pages/Users';
 import Roles from '@/pages/Roles';
 import SchoolSettings from '@/pages/SchoolSettings';
@@ -192,6 +194,22 @@ export default function App() {
                                 element={
                                     <ProtectedRoute permissions={['website.manage']}>
                                         <WebsiteSettings />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="staff-attendance"
+                                element={
+                                    <ProtectedRoute permissions={['hr.view']}>
+                                        <StaffAttendance />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="leaves"
+                                element={
+                                    <ProtectedRoute permissions={['hr.view']}>
+                                        <LeavesPage />
                                     </ProtectedRoute>
                                 }
                             />

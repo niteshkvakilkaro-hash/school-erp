@@ -164,6 +164,7 @@ export default function LoginScreen() {
                                     </Text>
                                     <Subtle>Parent: parent@sunrise.com / parent123</Subtle>
                                     <Subtle>Student: student@sunrise.com / student123</Subtle>
+                                    <Subtle>Teacher: anita.sharma@sunrise.com / teacher123</Subtle>
                                     <Subtle style={{ marginTop: 8, fontSize: 11 }}>API: {API_URL}</Subtle>
                                 </Card>
                             </>
