@@ -85,9 +85,14 @@ async function riderCounts(req, routeIds) {
 }
 
 /** Vehicle kisi aur active route par to nahi laga - ek bus ek hi route chalti hai. */
-async function assertVehicleFree(req, vehicleId, exceptRouteId) {
+async function assertVehicleFree(req, vehicleId, exceptRouteId, { requireActive = true } = {}) {
     if (!vehicleId) return null;
     const vehicle = await assertSameTenant(Vehicle, req, vehicleId, 'Vehicle');
+    if (requireActive && vehicle.status !== 'active') {
+        throw ApiError.badRequest('Ye vehicle ' + vehicle.status + ' me hai - route par nahi lag sakta', [
+            { field: 'vehicleId', message: 'Active vehicle chuniye' },
+        ]);
+    }
     const other = await TransportRoute.findOne({
         where: scopedWhere(req, {
             vehicleId,
@@ -238,7 +243,9 @@ export const updateRoute = asyncHandler(async (req, res) => {
     const riders = (await riderCounts(req, [route.id]))[route.id] || 0;
 
     if (status === 'active') {
-        const vehicle = await assertVehicleFree(req, vehicleId, route.id);
+        const vehicle = await assertVehicleFree(req, vehicleId, route.id, {
+            requireActive: vehicleId !== route.vehicleId || route.status !== 'active',
+        });
         if (riders && !vehicle) {
             throw ApiError.badRequest('Is route par ' + riders + ' students hain - vehicle hatana possible nahi', [
                 { field: 'vehicleId', message: 'Vehicle chuniye' },
@@ -344,6 +351,9 @@ export const assignStudent = asyncHandler(async (req, res) => {
         }
 
         const vehicle = await Vehicle.findByPk(route.vehicleId, { transaction: t });
+        if (vehicle.status !== 'active') {
+            throw ApiError.badRequest('Route ' + route.code + ' ki gaadi ' + vehicle.regNo + ' abhi ' + vehicle.status + ' me hai - pehle doosri gaadi lagaiye');
+        }
         const existing = await StudentTransport.findOne({ where: { studentId }, transaction: t });
         const sameRoute = existing && existing.routeId === route.id;
 

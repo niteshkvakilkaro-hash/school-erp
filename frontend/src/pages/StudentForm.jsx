@@ -100,8 +100,8 @@ export function StudentForm({ open, onOpenChange, student, classes, onSaved }) {
             if (isEdit && !payload.password) delete payload.password;
 
             if (isEdit) {
-                await api.put('/students/' + student.id, payload);
-                toast.success('Student update ho gaya');
+                const { data } = await api.put('/students/' + student.id, payload);
+                toast.success(data.message.includes('transport') ? 'Student update ho gaya - bus ki seat bhi khali kar di' : 'Student update ho gaya');
             } else {
                 await api.post('/students', payload);
                 toast.success('Admission ho gaya');

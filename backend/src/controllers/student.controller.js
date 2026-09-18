@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Op } from 'sequelize';
-import { sequelize, Student, User, SchoolClass, Section, Role } from '../models/index.js';
+import { sequelize, Student, User, SchoolClass, Section, Role, StudentTransport } from '../models/index.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { getPagination, paginated } from '../utils/pagination.js';
@@ -207,9 +207,15 @@ export const update = asyncHandler(async (req, res) => {
     await assertSectionBelongsToClass(req, nextClassId, nextSectionId);
 
     const roleId = createLogin && !student.userId ? await studentRoleId(req) : null;
+    let transportFreed = 0;
 
     await sequelize.transaction(async (t) => {
         await student.update(profile, { transaction: t });
+
+        // School chhod diya ya inactive hua to bus ki seat khali kar do
+        if (student.status !== 'active') {
+            transportFreed = await StudentTransport.destroy({ where: { studentId: student.id }, transaction: t });
+        }
 
         if (student.userId) {
             const user = await User.scope('withPassword').findByPk(student.userId, { transaction: t });
@@ -254,7 +260,11 @@ export const update = asyncHandler(async (req, res) => {
     });
 
     const full = await Student.findByPk(student.id, { include: includes });
-    res.json({ success: true, message: 'Student updated', data: full });
+    res.json({
+        success: true,
+        message: transportFreed ? 'Student updated - transport seat bhi khali kar di' : 'Student updated',
+        data: full,
+    });
 });
 
 export const remove = asyncHandler(async (req, res) => {

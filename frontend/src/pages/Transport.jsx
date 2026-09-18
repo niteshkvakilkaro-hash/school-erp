@@ -292,6 +292,12 @@ function RoutesGrid({ routes, loading, canManage, onEdit, onDelete, onAddStop, o
                                                 {r.riders}/{cap} seats
                                             </span>
                                         </div>
+                                        {r.vehicle.status !== 'active' ? (
+                                            <p className="mt-2 flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400">
+                                                <AlertTriangle className="h-3.5 w-3.5" /> Gaadi {r.vehicle.status} me hai - naye students
+                                                assign nahi honge, doosri gaadi lagaiye
+                                            </p>
+                                        ) : null}
                                     </>
                                 ) : (
                                     <p className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
@@ -343,7 +349,12 @@ function RoutesGrid({ routes, loading, canManage, onEdit, onDelete, onAddStop, o
                                     </Button>
                                     <Button
                                         size="sm"
-                                        disabled={r.status !== 'active' || !r.vehicle || !r.stops.length || r.seatsLeft <= 0}
+                                        disabled={
+                                            r.status !== 'active' ||
+                                            r.vehicle?.status !== 'active' ||
+                                            !r.stops.length ||
+                                            r.seatsLeft <= 0
+                                        }
                                         onClick={() => onAssign(r)}
                                     >
                                         <UserPlus /> Assign student

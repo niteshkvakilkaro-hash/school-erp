@@ -254,6 +254,8 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 - Transport: ek vehicle ek hi active route par; route ke students vehicle ki seats se zyada nahi ho sakte. Assign route row lock ke saath hota hai - aakhri seat par do log ek saath nahi aa sakte.
 - Stop usi route ka hona chahiye; student dusre route par assign karne se purana assignment shift ho jata hai (ek student = ek route).
 - Jis vehicle/route/stop par students hain wo delete nahi hota, aur vehicle ki capacity riders se kam nahi ki ja sakti.
+- Maintenance/inactive gaadi kisi active route par nahi lagti, aur jis route ki gaadi maintenance me ho us par naye students assign nahi hote (pehle doosri gaadi lagaiye).
+- Student inactive ya alumni hote hi uski bus seat apne aap khali ho jati hai. Wapas active karne par transport dobara assign karna padta hai.
 
 ## Useful commands
 

@@ -82,8 +82,9 @@ export function RouteModal({ route, vehicles, onClose, onSaved }) {
                     <option value="">Abhi koi nahi</option>
                     {vehicles.map((v) => {
                         const busy = v.route && v.route.id !== route?.id;
+                        const current = route?.vehicleId === v.id;
                         return (
-                            <option key={v.id} value={v.id} disabled={busy}>
+                            <option key={v.id} value={v.id} disabled={busy || (v.status !== 'active' && !current)}>
                                 {v.regNo} - {v.capacity} seats
                                 {busy ? ' (route ' + v.route.code + ')' : v.status !== 'active' ? ' (' + v.status + ')' : ''}
                             </option>

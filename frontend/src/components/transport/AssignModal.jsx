@@ -25,7 +25,7 @@ export function AssignModal({ target, routes, onClose, onSaved }) {
         setStopId(String(rider?.stopId || ''));
     }, [target, rider]);
 
-    const usable = routes.filter((r) => r.status === 'active' && r.vehicle);
+    const usable = routes.filter((r) => r.status === 'active' && r.vehicle?.status === 'active');
     const route = usable.find((r) => String(r.id) === routeId);
     const sameRoute = rider && String(rider.routeId) === routeId;
     const full = route && !sameRoute && route.seatsLeft <= 0;
