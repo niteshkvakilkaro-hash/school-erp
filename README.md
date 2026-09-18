@@ -58,7 +58,8 @@ chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
 | `student_transport` | Kaunsa student kis route aur stop se (ek student = ek row) |
 | `admissions` | Enquiry / application - bachcha, parents, class, source, stage, follow-up, interview |
 | `admission_logs` | Har application ki timeline - stage badla ya note, kisne aur kab |
-| `school_sites` | School ki public website - theme, hero, about, principal, highlights, facilities, socials, publish |
+| `school_sites` | School ki public website - theme, hero, about, principal, highlights, facilities, videos, reviews, FAQ, socials, publish |
+| `site_media` | Website ki photos - slider, gallery (albums), logo, principal photo. File `backend/uploads/schools/<id>/` me |
 
 ## Setup
 
@@ -130,7 +131,13 @@ Admin panel me **Settings → Website** se:
 
 - 4 themes: **Emerald Fresh**, **Midnight Neon** (dark, purple-pink-orange gradient), **Royal Classic**, **Sunrise Warm**.
   Kisi bhi theme ko `?theme=midnight` laga kar bina save kiye dekh sakte hain.
+- **Hero slider** - school ki apni photos (max 8), har slide par title/caption, auto-play, arrows, swipe. Photos na hon to theme wala illustration.
+- **Photo gallery** - albums (Campus, Sports, Events, ya koi naya), full-screen lightbox (keyboard + swipe). Max 80 photos.
+- **Videos** - YouTube / Vimeo link; click karne par hi video load hota hai (page tez rehta hai).
+- **Logo** (website + ERP), **principal ki photo**, parents ke reviews, FAQ, Google map.
 - Hero, about, principal ka message, "why choose us", facilities, social links, admission note.
+- Upload: JPG/PNG/WebP, 8 MB tak. Server par photo WebP me chhoti hoti hai (slide 2000px, gallery 1600px + thumbnail),
+  EXIF/GPS hat jata hai, aur jo file asli image nahi hai (SVG, script) wo reject hoti hai.
 - Publish on/off. Band website sirf usi school ke logged-in user ko "Preview" banner ke saath dikhti hai.
 - Admission enquiry form (page par aur "Request a callback" popup) - seedha **Admissions** me "Website"
   source ke saath, kal ka follow-up laga ke. IP par 15 min me 5 requests ki limit + hidden spam field.
@@ -324,12 +331,14 @@ Phase 1 me sirf core hai. Ye modules abhi baaki hain — models aur permission
 catalog aise banaye gaye hain ki ye seedha add ho jayenge:
 
 - Inventory
-- Website par photo gallery / image upload (abhi logo URL aur theme illustrations)
+- Website par video file upload (abhi YouTube/Vimeo link)
 - Custom domain (abhi `/site/<slug>`)
 - Transport fee ko Fees module ke student fees me apne aap jodna
 - Homework submissions (abhi sirf assign hota hai, student upload nahi karta)
 
 ## Production notes
+
+- `backend/uploads/` me schools ki photos hain - git me nahi jaati. Server par is folder ko persistent disk / backup me rakhiye.
 
 - `backend/.env` me `JWT_SECRET` zaroor badliye, `NODE_ENV=production` set kijiye.
 - `CLIENT_URL` comma se alag karke kai origins le leta hai (web panel + Expo web dev).

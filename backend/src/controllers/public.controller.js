@@ -2,7 +2,7 @@ import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
 import {
-    sequelize, School, User, Student, Teacher, SchoolClass, Notice, Admission, AdmissionLog,
+    sequelize, School, User, Student, Teacher, SchoolClass, Notice, Admission, AdmissionLog, SiteMedia,
 } from '../models/index.js';
 import { env } from '../config/env.js';
 import ApiError from '../utils/ApiError.js';
@@ -42,7 +42,7 @@ export const site = asyncHandler(async (req, res) => {
     if (!s.published && !preview) throw ApiError.notFound('Website abhi publish nahi hui');
 
     const d = today();
-    const [students, teachers, classes, notices] = await Promise.all([
+    const [students, teachers, classes, notices, media] = await Promise.all([
         Student.count({ where: { schoolId: school.id, status: 'active' } }),
         Teacher.count({ where: { schoolId: school.id, status: 'active' } }),
         SchoolClass.findAll({ where: { schoolId: school.id }, attributes: ['id', 'name'], order: [['level', 'ASC']] }),
@@ -58,7 +58,13 @@ export const site = asyncHandler(async (req, res) => {
             order: [['publishOn', 'DESC']],
             limit: 6,
         }),
+        SiteMedia.findAll({
+            where: { schoolId: school.id },
+            attributes: ['id', 'kind', 'url', 'thumbUrl', 'width', 'height', 'title', 'caption', 'category'],
+            order: [['sortOrder', 'ASC'], ['id', 'ASC']],
+        }),
     ]);
+    const ofKind = (k) => media.filter((m) => m.kind === k).map((m) => m.toJSON());
 
     const json = s.toJSON();
     // Website ke setting fields - internal id/timestamps bahar nahi
@@ -81,7 +87,9 @@ export const site = asyncHandler(async (req, res) => {
                 logo: school.logo,
                 session: school.session,
             },
-            site: json,
+            site: { ...json, principalPhoto: ofKind('principal')[0]?.url || null },
+            slides: ofKind('slide'),
+            gallery: ofKind('gallery'),
             stats: s.showStats
                 ? {
                       students,

@@ -44,6 +44,13 @@ const SchoolSite = sequelize.define(
         highlights: jsonText('highlights', []),
         facilities: jsonText('facilities', []),
         socials: jsonText('socials', {}),
+        // [{ title, url }] - YouTube / Vimeo link
+        videos: jsonText('videos', []),
+        // [{ name, role, text }] - parents kya kehte hain
+        testimonials: jsonText('testimonials', []),
+        // [{ q, a }]
+        faqs: jsonText('faqs', []),
+        showMap: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
         showStats: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
         admissionOpen: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
         admissionNote: { type: DataTypes.STRING(255) },

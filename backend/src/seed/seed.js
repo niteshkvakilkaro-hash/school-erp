@@ -30,6 +30,10 @@ import { seedLibrary } from './_library.js';
 import { seedTransport } from './_transport.js';
 import { seedAdmissions } from './_admissions.js';
 import { seedWebsite } from './_website.js';
+import { seedWebsiteMedia } from './_websiteMedia.js';
+import { UPLOAD_ROOT } from '../utils/upload.js';
+import fsp from 'node:fs/promises';
+import path from 'node:path';
 
 const FORCE = process.argv.includes('--force');
 
@@ -327,6 +331,8 @@ async function run() {
 
     if (FORCE) {
         await sequelize.sync({ force: true });
+        // Purane schools ki uploaded photos bhi saaf - DB ke saath mel khaye
+        await fsp.rm(path.join(UPLOAD_ROOT, 'schools'), { recursive: true, force: true });
         console.log('[seed] saari tables dubara bana di gayi (--force)');
     } else {
         await sequelize.sync({ alter: true });
@@ -367,6 +373,7 @@ async function run() {
         const trStats = await seedTransport(ctx.school);
         const admStats = await seedAdmissions(ctx.school, ctx.users);
         const siteTheme = await seedWebsite(ctx.school);
+        const photoCount = await seedWebsiteMedia(ctx.school);
 
         console.log(
             '[seed] ' + def.name + ' (' + def.code + '): ' +
@@ -393,7 +400,7 @@ async function run() {
             trStats.stops + ' stops, ' + trStats.riders + ' riders'
         );
         console.log('         admissions: ' + admStats.admissions + ' applications, ' + admStats.logs + ' timeline entries');
-        console.log('         website: /site/' + ctx.school.slug + ' (' + siteTheme + ' theme)');
+        console.log('         website: /site/' + ctx.school.slug + ' (' + siteTheme + ' theme, ' + photoCount + ' photos)');
 
         lines.push('  ' + def.name + '  [' + def.code + ']');
         lines.push('    School Admin : ' + def.admin[1] + '  / admin123');

@@ -3,6 +3,7 @@ import {
     Menu, X, Phone, ArrowRight, Sparkles, GraduationCap, BookOpen, Trophy, Palette, FlaskConical, LogIn, ArrowUpRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HeroSlider, mediaUrl } from './Media';
 
 export const initialsOf = (name = '') =>
     name
@@ -16,7 +17,7 @@ export function Logo({ school }) {
     return (
         <a href="#top" className="flex items-center gap-3">
             {school.logo ? (
-                <img src={school.logo} alt="" className="h-10 w-10 rounded-xl object-cover" />
+                <img src={mediaUrl(school.logo)} alt={school.name + ' logo'} className="h-10 w-10 rounded-xl bg-white object-contain p-0.5" />
             ) : (
                 <span className="s-btn-grad flex h-10 w-10 items-center justify-center rounded-xl text-sm font-extrabold">
                     {initialsOf(school.name)}
@@ -32,16 +33,24 @@ export function Logo({ school }) {
     );
 }
 
-const LINKS = [
-    ['#about', 'About'],
-    ['#why', 'Why us'],
-    ['#campus', 'Campus'],
-    ['#news', 'News'],
-    ['#admissions', 'Admissions'],
-    ['#contact', 'Contact'],
-];
+/** Menu me sirf wahi links jinka section page par hai (max 7, warna menu bhar jata hai). */
+function linksFor(site, has) {
+    return [
+        ['#about', 'About', true],
+        ['#why', 'Why us', site.highlights?.length > 0],
+        ['#gallery', 'Gallery', has.gallery],
+        ['#videos', 'Videos', has.videos && !has.gallery],
+        ['#news', 'News', has.news],
+        ['#admissions', 'Admissions', true],
+        ['#faq', 'FAQ', site.faqs?.length > 0 && !has.gallery],
+        ['#contact', 'Contact', true],
+    ]
+        .filter((l) => l[2])
+        .slice(0, 7);
+}
 
-export function Nav({ school, site, onCallback }) {
+export function Nav({ school, site, has = {}, onCallback }) {
+    const LINKS = linksFor(site, has);
     const [open, setOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
@@ -186,7 +195,75 @@ function HeroArt() {
     );
 }
 
-export function Hero({ school, site, onCallback }) {
+/** Hero ka text - slider (photo par, safed) aur bina photo wale hero dono me. */
+function HeroCopy({ school, site, onCallback, onImage }) {
+    const muted = onImage ? 'text-white/80' : 'text-[var(--s-muted)]';
+    return (
+        <div className="s-reveal max-w-2xl">
+            {site.tagline ? (
+                <p className={cn('mb-6 inline-flex items-center gap-2 text-sm font-semibold', onImage ? 's-grad-text-bright' : 's-grad-text')}>
+                    <Sparkles className={cn('h-4 w-4', onImage ? 'text-white' : 'text-[var(--s-primary)]')} /> {site.tagline}
+                </p>
+            ) : null}
+            <h1 className={cn('text-[2.6rem] font-extrabold leading-[1.05] sm:text-6xl lg:text-[4.2rem]', onImage && 'text-white drop-shadow-sm')}>
+                <span className="block">{site.heroTitle || school.name}</span>
+                {site.heroHighlight ? (
+                    <span className={cn('block pb-2', onImage ? 's-grad-text-bright' : 's-grad-text')}>{site.heroHighlight}</span>
+                ) : null}
+            </h1>
+            {site.heroSubtitle ? <p className={cn('mt-6 max-w-xl text-lg leading-relaxed', muted)}>{site.heroSubtitle}</p> : null}
+
+            <div
+                className={cn(
+                    'mt-8 flex max-w-xl flex-col gap-3 rounded-2xl border p-2 backdrop-blur sm:flex-row sm:items-center',
+                    onImage ? 'border-white/20 bg-white/10' : 'border-[var(--s-border)] bg-[var(--s-surface)] shadow-[var(--s-shadow)]'
+                )}
+            >
+                <p className={cn('flex-1 px-3 py-2 text-sm', muted)}>
+                    {site.admissionOpen ? 'Admissions open for ' + (school.session || 'the new session') : 'Visit our campus and meet our teachers'}
+                </p>
+                <a
+                    href={site.admissionOpen ? '#admissions' : '#contact'}
+                    className="s-btn-grad flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold"
+                >
+                    {site.admissionOpen ? 'Enquire now' : 'Contact us'} <ArrowRight className="h-4 w-4" />
+                </a>
+            </div>
+
+            {!onImage && site.facilities?.length ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                    {site.facilities.slice(0, 4).map((f) => (
+                        <span key={f} className="rounded-full border border-[var(--s-border)] bg-[var(--s-surface)] px-3 py-1.5 text-xs text-[var(--s-muted)]">
+                            {f}
+                        </span>
+                    ))}
+                </div>
+            ) : null}
+
+            {site.admissionOpen ? (
+                <button
+                    onClick={onCallback}
+                    className={cn(
+                        'mt-5 inline-flex items-center gap-1.5 text-sm font-medium',
+                        onImage ? 'text-white hover:text-white/80' : 'text-[var(--s-text)] hover:text-[var(--s-primary)]'
+                    )}
+                >
+                    Or ask for a callback <ArrowUpRight className="h-4 w-4" />
+                </button>
+            ) : null}
+        </div>
+    );
+}
+
+/** School ki photos hon to slider, warna theme wala illustration. */
+export function Hero({ school, site, slides, onCallback }) {
+    if (slides?.length) {
+        return (
+            <HeroSlider slides={slides}>
+                <HeroCopy school={school} site={site} onCallback={onCallback} onImage />
+            </HeroSlider>
+        );
+    }
     return (
         <section id="top" className="relative">
             {/* Glow neeche fade hota hai taaki agle section par seedhi line na bane */}
@@ -196,53 +273,7 @@ export function Hero({ school, site, onCallback }) {
             />
             <div className="s-grid-bg pointer-events-none absolute inset-0" />
             <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 pb-16 pt-10 sm:px-6 lg:grid-cols-[1.05fr_1fr] lg:pb-24 lg:pt-16">
-                <div className="s-reveal">
-                    {site.tagline ? (
-                        <p className="s-grad-text mb-6 inline-flex items-center gap-2 text-sm font-semibold">
-                            <Sparkles className="h-4 w-4 text-[var(--s-primary)]" /> {site.tagline}
-                        </p>
-                    ) : null}
-                    <h1 className="text-[2.6rem] font-extrabold leading-[1.05] sm:text-6xl lg:text-[4.2rem]">
-                        <span className="block">{site.heroTitle || school.name}</span>
-                        {site.heroHighlight ? <span className="s-grad-text block pb-2">{site.heroHighlight}</span> : null}
-                    </h1>
-                    {site.heroSubtitle ? (
-                        <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--s-muted)]">{site.heroSubtitle}</p>
-                    ) : null}
-
-                    <div className="mt-8 flex max-w-xl flex-col gap-3 rounded-2xl border border-[var(--s-border)] bg-[var(--s-surface)] p-2 shadow-[var(--s-shadow)] backdrop-blur sm:flex-row sm:items-center">
-                        <p className="flex-1 px-3 py-2 text-sm text-[var(--s-muted)]">
-                            {site.admissionOpen
-                                ? 'Admissions open for ' + (school.session || 'the new session')
-                                : 'Visit our campus and meet our teachers'}
-                        </p>
-                        {site.admissionOpen ? (
-                            <a href="#admissions" className="s-btn-grad flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold">
-                                Enquire now <ArrowRight className="h-4 w-4" />
-                            </a>
-                        ) : (
-                            <a href="#contact" className="s-btn-grad flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold">
-                                Contact us <ArrowRight className="h-4 w-4" />
-                            </a>
-                        )}
-                    </div>
-
-                    {site.facilities?.length ? (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                            {site.facilities.slice(0, 4).map((f) => (
-                                <span key={f} className="rounded-full border border-[var(--s-border)] bg-[var(--s-surface)] px-3 py-1.5 text-xs text-[var(--s-muted)]">
-                                    {f}
-                                </span>
-                            ))}
-                        </div>
-                    ) : null}
-
-                    {site.admissionOpen ? (
-                        <button onClick={onCallback} className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--s-text)] hover:text-[var(--s-primary)]">
-                            Or ask for a callback <ArrowUpRight className="h-4 w-4" />
-                        </button>
-                    ) : null}
-                </div>
+                <HeroCopy school={school} site={site} onCallback={onCallback} />
                 <div className="s-reveal hidden sm:block" style={{ animationDelay: '0.15s' }}>
                     <HeroArt />
                 </div>

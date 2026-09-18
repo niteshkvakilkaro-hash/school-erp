@@ -111,6 +111,22 @@
     background-clip: text;
     color: transparent;
 }
+/* Photo ke upar - andhere background par chamakne wala gradient */
+.s-grad-text-bright {
+    background: var(--s-grad-bright, var(--s-grad));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.site[data-theme='emerald'] {
+    --s-grad-bright: linear-gradient(100deg, #6ee7b7, #34d399 50%, #d9f99d);
+}
+.site[data-theme='royal'] {
+    --s-grad-bright: linear-gradient(100deg, #93c5fd, #bfdbfe 45%, #fcd34d);
+}
+.site[data-theme='sunrise'] {
+    --s-grad-bright: linear-gradient(100deg, #fdba74, #fb923c 45%, #fda4af);
+}
 .s-btn-grad {
     background: var(--s-grad);
     color: var(--s-on-grad);

@@ -32,6 +32,7 @@ import StudentTransport from './StudentTransport.js';
 import Admission from './Admission.js';
 import AdmissionLog from './AdmissionLog.js';
 import SchoolSite from './SchoolSite.js';
+import SiteMedia from './SiteMedia.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -41,7 +42,7 @@ const TENANT_MODELS = [
     User, Teacher, Student, StudentGuardian, SchoolClass, Section, Subject,
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
     FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice, Book, BookIssue,
-    Vehicle, TransportRoute, RouteStop, StudentTransport, Admission, AdmissionLog, SchoolSite,
+    Vehicle, TransportRoute, RouteStop, StudentTransport, Admission, AdmissionLog, SchoolSite, SiteMedia,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -224,6 +225,7 @@ AdmissionLog.belongsTo(Admission, { foreignKey: 'admissionId', as: 'admission' }
 AdmissionLog.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 School.hasOne(SchoolSite, { foreignKey: 'schoolId', as: 'site' });
+School.hasMany(SiteMedia, { foreignKey: 'schoolId', as: 'media' });
 
 export {
     sequelize,
@@ -260,4 +262,5 @@ export {
     Admission,
     AdmissionLog,
     SchoolSite,
+    SiteMedia,
 };

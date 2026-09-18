@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
     GraduationCap, MonitorSmartphone, Bus, Smartphone, Trophy, HeartHandshake, FlaskConical, Palette, Quote, Users,
     School, CalendarDays, Megaphone, MapPin, Phone, Mail, Instagram, Facebook, Youtube, MessageCircle, X, Sparkles,
@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { EnquiryForm } from './EnquiryForm';
 import { Logo } from './Hero';
+import { mediaUrl } from './Media';
 
 const HIGHLIGHT_ICONS = [GraduationCap, MonitorSmartphone, Bus, Smartphone, Trophy, HeartHandshake, FlaskConical, Palette];
 
@@ -38,7 +39,7 @@ function Section({ id, alt, children }) {
     );
 }
 
-export function Stats({ stats }) {
+export function Stats({ stats, afterSlider }) {
     if (!stats) return null;
     const items = [
         [Users, stats.students, 'Happy students'],
@@ -47,7 +48,7 @@ export function Stats({ stats }) {
         stats.years ? [Trophy, stats.years + '+', 'Years of trust'] : null,
     ].filter(Boolean);
     return (
-        <div className="relative mx-auto -mt-4 max-w-7xl px-4 sm:px-6">
+        <div className={(afterSlider ? 'mt-6 ' : '-mt-4 ') + 'relative mx-auto max-w-7xl px-4 sm:px-6'}>
             <div className={'s-card grid grid-cols-2 gap-px overflow-hidden rounded-3xl ' + (items.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3')}>
                 {items.map(([Icon, value, label]) => (
                     <div key={label} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4 sm:p-6">
@@ -99,9 +100,17 @@ export function About({ school, site }) {
                         <Quote className="relative h-10 w-10 text-[var(--s-primary)]" />
                         <blockquote className="relative mt-4 whitespace-pre-line text-lg leading-relaxed">{site.principalMessage}</blockquote>
                         <figcaption className="relative mt-6 flex items-center gap-3">
-                            <span className="s-btn-grad flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold">
-                                {(site.principalName || 'P').split(/\s+/).filter((w) => !w.endsWith('.')).map((w) => w[0]).slice(0, 2).join('')}
-                            </span>
+                            {site.principalPhoto ? (
+                                <img
+                                    src={mediaUrl(site.principalPhoto)}
+                                    alt={site.principalName || 'Principal'}
+                                    className="h-14 w-14 rounded-full object-cover ring-2 ring-[var(--s-primary)] ring-offset-2 ring-offset-[var(--s-bg)]"
+                                />
+                            ) : (
+                                <span className="s-btn-grad flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold">
+                                    {(site.principalName || 'P').split(/\s+/).filter((w) => !w.endsWith('.')).map((w) => w[0]).slice(0, 2).join('')}
+                                </span>
+                            )}
                             <span>
                                 <span className="block font-semibold">{site.principalName || 'Principal'}</span>
                                 <span className="block text-sm text-[var(--s-muted)]">Principal</span>
@@ -290,6 +299,17 @@ export function Contact({ school, site }) {
                     </a>
                 ))}
             </div>
+            {site.showMap && address ? (
+                <div className="s-card mt-5 overflow-hidden rounded-3xl">
+                    <iframe
+                        title={'Map - ' + school.name}
+                        src={'https://maps.google.com/maps?q=' + encodeURIComponent(school.name + ', ' + address) + '&z=15&output=embed'}
+                        className="h-72 w-full border-0 sm:h-96"
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                    />
+                </div>
+            ) : null}
             {socials.length ? (
                 <div className="mt-8 flex flex-wrap gap-3">
                     {socials.map(([Icon, href, label]) => (
@@ -364,12 +384,24 @@ export function CallbackModal({ open, onClose, school, classes, exitIntent }) {
     );
 }
 
+/** Hero ke baad hi dikhta hai - hero me pehle se callback link hai aur slider ke controls se na takraye. */
 export function FloatingCallback({ onClick }) {
+    const [show, setShow] = useState(false);
+    useEffect(() => {
+        const on = () => setShow(window.scrollY > window.innerHeight * 0.6);
+        on();
+        window.addEventListener('scroll', on, { passive: true });
+        return () => window.removeEventListener('scroll', on);
+    }, []);
     return (
         <button
             onClick={onClick}
             aria-label="Request a callback"
-            className="s-btn-grad fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full"
+            tabIndex={show ? 0 : -1}
+            className={
+                's-btn-grad fixed bottom-5 left-5 z-40 flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 ' +
+                (show ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0')
+            }
         >
             <PhoneCall className="h-6 w-6" />
             <span className="absolute -right-0.5 -top-0.5 h-3.5 w-3.5 rounded-full border-2 border-[var(--s-bg)] bg-emerald-400" />

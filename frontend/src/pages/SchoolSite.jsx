@@ -9,6 +9,8 @@ import { Nav, Hero } from '@/site/Hero';
 import {
     Stats, About, Highlights, Campus, News, Admissions, Contact, Footer, CallbackModal, FloatingCallback,
 } from '@/site/Sections';
+import { Gallery, Videos, parseVideo } from '@/site/Media';
+import { Testimonials, Faq } from '@/site/More';
 
 /** Admin preview me neeche-daayein theme badal kar dekhne ka switcher. */
 function ThemeSwitcher({ value, onChange }) {
@@ -125,7 +127,12 @@ export default function SchoolSite() {
         );
     }
 
-    const { school, site, stats, classes, notices, preview } = data;
+    const { school, site, stats, classes, notices, preview, slides, gallery } = data;
+    const has = {
+        gallery: gallery?.length > 0,
+        videos: (site.videos || []).some((v) => parseVideo(v.url)),
+        news: notices?.length > 0,
+    };
     const openCallback = () => setCallback('click');
 
     return (
@@ -135,15 +142,19 @@ export default function SchoolSite() {
                     <Eye className="h-4 w-4" /> Preview - website abhi publish nahi hai, sirf aap dekh rahe hain
                 </div>
             ) : null}
-            <Nav school={school} site={site} onCallback={openCallback} />
+            <Nav school={school} site={site} has={has} onCallback={openCallback} />
             <main>
-                <Hero school={school} site={site} onCallback={openCallback} />
-                <Stats stats={stats} />
+                <Hero school={school} site={site} slides={slides} onCallback={openCallback} />
+                <Stats stats={stats} afterSlider={slides?.length > 0} />
                 <About school={school} site={site} />
                 <Highlights site={site} />
                 <Campus site={site} />
+                <Gallery items={gallery} />
+                <Videos videos={site.videos} />
+                <Testimonials items={site.testimonials} />
                 <News notices={notices} />
                 <Admissions school={school} site={site} classes={classes} />
+                <Faq items={site.faqs} school={school} />
                 <Contact school={school} site={site} />
             </main>
             <Footer school={school} />
