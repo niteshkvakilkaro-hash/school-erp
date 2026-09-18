@@ -19,6 +19,8 @@ import noticeRoutes from './notice.routes.js';
 import libraryRoutes from './library.routes.js';
 import transportRoutes from './transport.routes.js';
 import admissionRoutes from './admission.routes.js';
+import publicRoutes from './public.routes.js';
+import websiteRoutes from './website.routes.js';
 import { authenticate, resolveTenant, requireTenant, can } from '../middleware/auth.js';
 import { stats } from '../controllers/dashboard.controller.js';
 
@@ -35,6 +37,7 @@ router.use('/platform', platformRoutes);
 
 // Mobile app (parent + student)
 router.use('/portal', portalRoutes);
+router.use('/public', publicRoutes);
 
 // School-scoped modules
 router.get(
@@ -49,6 +52,7 @@ router.use('/school', schoolRoutes);
 router.use('/roles', roleRoutes);
 router.use('/users', userRoutes);
 router.use('/admissions', admissionRoutes);
+router.use('/website', websiteRoutes);
 router.use('/students', studentRoutes);
 router.use('/teachers', teacherRoutes);
 router.use('/classes', classRoutes);

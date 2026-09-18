@@ -29,6 +29,7 @@ import { seedNotices } from './_notices.js';
 import { seedLibrary } from './_library.js';
 import { seedTransport } from './_transport.js';
 import { seedAdmissions } from './_admissions.js';
+import { seedWebsite } from './_website.js';
 
 const FORCE = process.argv.includes('--force');
 
@@ -365,6 +366,7 @@ async function run() {
         const libStats = await seedLibrary(ctx.school, ctx.users);
         const trStats = await seedTransport(ctx.school);
         const admStats = await seedAdmissions(ctx.school, ctx.users);
+        const siteTheme = await seedWebsite(ctx.school);
 
         console.log(
             '[seed] ' + def.name + ' (' + def.code + '): ' +
@@ -391,6 +393,7 @@ async function run() {
             trStats.stops + ' stops, ' + trStats.riders + ' riders'
         );
         console.log('         admissions: ' + admStats.admissions + ' applications, ' + admStats.logs + ' timeline entries');
+        console.log('         website: /site/' + ctx.school.slug + ' (' + siteTheme + ' theme)');
 
         lines.push('  ' + def.name + '  [' + def.code + ']');
         lines.push('    School Admin : ' + def.admin[1] + '  / admin123');

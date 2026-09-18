@@ -20,6 +20,7 @@ import Notices from '@/pages/Notices';
 import LibraryPage from '@/pages/Library';
 import TransportPage from '@/pages/Transport';
 import AdmissionsPage from '@/pages/Admissions';
+import WebsiteSettings from '@/pages/WebsiteSettings';
 import Users from '@/pages/Users';
 import Roles from '@/pages/Roles';
 import SchoolSettings from '@/pages/SchoolSettings';
@@ -183,6 +184,14 @@ export default function App() {
                                 element={
                                     <ProtectedRoute permissions={['admissions.view']}>
                                         <AdmissionsPage />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="website"
+                                element={
+                                    <ProtectedRoute permissions={['website.manage']}>
+                                        <WebsiteSettings />
                                     </ProtectedRoute>
                                 }
                             />

@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#042f24"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "in.erpsc.school"
@@ -25,8 +27,6 @@
     "web": {
       "bundler": "metro"
     },
-    "extra": {
-      "apiUrl": "http://10.0.2.2:5000/api"
-    }
+    "extra": {}
   }
 }

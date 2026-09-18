@@ -33,6 +33,7 @@ export const createSchema = z.object({
     eventDate: optionalDate,
     attachmentUrl: z.string().trim().max(255).optional(),
     isPublished: z.coerce.boolean().default(true),
+    showOnWebsite: z.coerce.boolean().default(false),
 });
 
 export const updateSchema = createSchema.partial();

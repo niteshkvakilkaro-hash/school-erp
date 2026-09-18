@@ -25,7 +25,9 @@ api.interceptors.response.use(
         const status = error.response?.status;
         const data = error.response?.data;
 
-        if (status === 401 && !error.config?.url?.includes('/auth/login')) {
+        // Public school website (/site/...) par visitor ko login page par nahi bhejna
+        const onPublicPage = window.location.pathname.startsWith('/site/');
+        if (status === 401 && !error.config?.url?.includes('/auth/login') && !onPublicPage) {
             localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem(SCHOOL_KEY);
             if (window.location.pathname !== '/login') window.location.href = '/login';

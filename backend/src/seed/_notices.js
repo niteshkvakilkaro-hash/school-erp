@@ -43,6 +43,8 @@ export async function seedNotices(school, users) {
             publishOn: iso(addDays(new Date(), pubOff)),
             expiresOn: expOff === null ? null : iso(addDays(new Date(), expOff)),
             eventDate: evtOff === null ? null : iso(addDays(new Date(), evtOff)),
+            // Events, chhutti aur exhibition website par bhi
+            showOnWebsite: ['event', 'holiday'].includes(category) || title === 'Science Exhibition',
             createdById: users.admin.id,
         });
         count++;

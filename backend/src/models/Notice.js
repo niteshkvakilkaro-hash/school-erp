@@ -43,6 +43,8 @@ const Notice = sequelize.define(
         // null = kabhi expire nahi hoti
         expiresOn: { type: DataTypes.DATEONLY },
         isPublished: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+        // School ki public website par bhi dikhe - default nahi, internal notices bahar na jayein
+        showOnWebsite: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
         // Events ke liye - notice board par date dikhane ke kaam aati hai
         eventDate: { type: DataTypes.DATEONLY },
         attachmentUrl: { type: DataTypes.STRING(255) },

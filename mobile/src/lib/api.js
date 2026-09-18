@@ -1,16 +1,29 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
 export const TOKEN_KEY = 'erpsc-token';
 
 /**
- * Android emulator se laptop ka localhost 10.0.2.2 hota hai.
- * Asli phone par .env me apne laptop ka LAN IP daaliye.
+ * Development me API usi laptop par chalti hai jahan se Expo app serve kar raha
+ * hai - uska IP khud nikal lete hain, taaki phone (Expo Go / browser) par bina
+ * setting ke chale. Build (APK) ke liye EXPO_PUBLIC_API_URL dena zaroori hai.
  */
+function devServerApi() {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.location?.hostname) {
+        return 'http://' + window.location.hostname + ':5000/api';
+    }
+    const host = (Constants.expoConfig?.hostUri || '').split(':')[0];
+    // Emulator ka localhost khud emulator hota hai - wahan 10.0.2.2
+    if (host && host !== 'localhost' && host !== '127.0.0.1') return 'http://' + host + ':5000/api';
+    return null;
+}
+
 export const API_URL =
     process.env.EXPO_PUBLIC_API_URL ||
     Constants.expoConfig?.extra?.apiUrl ||
+    devServerApi() ||
     'http://10.0.2.2:5000/api';
 
 const api = axios.create({ baseURL: API_URL, timeout: 15000 });

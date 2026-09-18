@@ -77,6 +77,8 @@ export const PERMISSIONS = [
     { slug: 'school.settings.view', module: 'School', label: 'School profile dekhna' },
     { slug: 'school.settings.update', module: 'School', label: 'School profile edit karna' },
 
+    { slug: 'website.manage', module: 'Website', label: 'School website ka content aur theme badalna' },
+
     // ---- Portal (mobile app) ----
     { slug: 'portal.self.view', module: 'Portal', label: 'Apna student record dekhna' },
     { slug: 'portal.child.view', module: 'Portal', label: 'Apne bachche ka record dekhna' },
@@ -117,6 +119,7 @@ export const SYSTEM_ROLES = [
             'admissions.view',
             'admissions.manage',
             'admissions.admit',
+            'website.manage',
             'teachers.view',
             'classes.view',
             'sections.view',

@@ -58,6 +58,7 @@ chalata hai, isliye phpMyAdmin me pehle se banane ki zaroorat nahi.
 | `student_transport` | Kaunsa student kis route aur stop se (ek student = ek row) |
 | `admissions` | Enquiry / application - bachcha, parents, class, source, stage, follow-up, interview |
 | `admission_logs` | Har application ki timeline - stage badla ya note, kisne aur kab |
+| `school_sites` | School ki public website - theme, hero, about, principal, highlights, facilities, socials, publish |
 
 ## Setup
 
@@ -121,6 +122,24 @@ group ban jayega.
 Guards dono taraf hain: menu item aur buttons permission ke bina dikhte hi nahi,
 aur API bhi 403 deta hai.
 
+## School website (public)
+
+Har school ki apni website: `/site/<school-slug>` - e.g.
+[localhost:5173/site/sunrise-public-school](http://localhost:5173/site/sunrise-public-school).
+Admin panel me **Settings → Website** se:
+
+- 4 themes: **Emerald Fresh**, **Midnight Neon** (dark, purple-pink-orange gradient), **Royal Classic**, **Sunrise Warm**.
+  Kisi bhi theme ko `?theme=midnight` laga kar bina save kiye dekh sakte hain.
+- Hero, about, principal ka message, "why choose us", facilities, social links, admission note.
+- Publish on/off. Band website sirf usi school ke logged-in user ko "Preview" banner ke saath dikhti hai.
+- Admission enquiry form (page par aur "Request a callback" popup) - seedha **Admissions** me "Website"
+  source ke saath, kal ka follow-up laga ke. IP par 15 min me 5 requests ki limit + hidden spam field.
+  Desktop par page chhodte waqt ek baar "Before you go" popup.
+- News & events: sirf wo notices jin par "School website par bhi dikhaiye" tick hai.
+- Students / teachers / classes ke numbers live ginti se.
+
+Website ka code alag chunk me load hota hai - visitor ko admin ERP ka code download nahi karna padta.
+
 ## Mobile app (Expo)
 
 ```bash
@@ -129,13 +148,30 @@ npm start          # QR code aayega, phone par Expo Go se scan kijiye
 npm run android    # Android emulator
 ```
 
-API ka pata `mobile/.env` me set hota hai:
+Development me API ka address khud nikalta hai - jis laptop se Expo chal raha hai usi ka IP
+(port 5000). Emulator par `10.0.2.2`. APK / production build ke liye `EXPO_PUBLIC_API_URL`
+dena zaroori hai (`mobile/eas.json` me profile ke hisaab se).
 
-| Kahan chala rahe ho | `EXPO_PUBLIC_API_URL` |
-| --- | --- |
-| Android emulator | `http://10.0.2.2:5000/api` |
-| iOS simulator | `http://localhost:5000/api` |
-| Asli phone (Expo Go) | `http://<laptop-ka-LAN-IP>:5000/api` |
+### Apne phone par test karna
+
+1. Laptop aur phone ek hi WiFi par hon.
+2. Root folder me: `npm run dev:phone` (API + admin panel + app, sab LAN par).
+3. Phone ke browser me: `http://<laptop-IP>:8081` - app (parent/student login).
+   Website: `http://<laptop-IP>:5173/site/sunrise-public-school`.
+4. Windows pehli baar "Allow access" pooche to **Private network** allow kijiye. Na pooche aur phone
+   se na khule to Admin PowerShell me:
+   `netsh advfirewall firewall add rule name="ERPSC dev" dir=in action=allow protocol=TCP localport=5000,5173,8081 profile=private`
+
+**Asli app (APK)** - is laptop par Android SDK/Java nahi hai, isliye APK Expo ke cloud par banta hai:
+
+```bash
+cd mobile
+npx eas-cli login                                  # free Expo account
+npx eas-cli build -p android --profile preview     # ~15 min, APK ka download link milega
+```
+
+`preview` profile ka API address `mobile/eas.json` me hai (abhi LAN IP) - server online karne
+ke baad use apne domain par badal dijiye.
 
 Tabs: **Home** (bachche ka card, stats, teachers), **Attendance** (percent donut +
 day-wise history), **Fees** (paid/pending progress + head-wise breakup + receipts),
@@ -202,6 +238,9 @@ POST   /library/issues/:id/return    POST /library/issues/:id/fine-paid
 GET    /admissions/summary      GET /admissions/seats/:classId
 GET    /admissions              POST /admissions   GET/PUT/DELETE /admissions/:id
 POST   /admissions/:id/status   POST /admissions/:id/notes   POST /admissions/:id/admit
+
+GET    /website                 PUT /website            (school admin)
+GET    /public/sites/:slug      POST /public/sites/:slug/enquiry   (bina login)
 
 GET    /transport/summary
 GET    /transport/vehicles      POST/PUT/DELETE /transport/vehicles/:id
@@ -274,6 +313,7 @@ Ye sab backend me enforce hote hain, sirf UI me nahi:
 | --- | --- |
 | `npm run dev` | API + admin panel |
 | `npm run dev:all` | API + admin panel + Expo app |
+| `npm run dev:phone` | Same, par LAN par - phone se test karne ke liye |
 | `npm run db:seed` | Tables sync + permissions + super admin (demo data preserve) |
 | `npm run db:reset` | Sab drop karke fresh demo data |
 | `npm run build` | Admin panel production build (`frontend/dist`) |
@@ -284,7 +324,8 @@ Phase 1 me sirf core hai. Ye modules abhi baaki hain — models aur permission
 catalog aise banaye gaye hain ki ye seedha add ho jayenge:
 
 - Inventory
-- Website par public admission enquiry form (abhi enquiry school staff hi darj karta hai)
+- Website par photo gallery / image upload (abhi logo URL aur theme illustrations)
+- Custom domain (abhi `/site/<slug>`)
 - Transport fee ko Fees module ke student fees me apne aap jodna
 - Homework submissions (abhi sirf assign hota hai, student upload nahi karta)
 

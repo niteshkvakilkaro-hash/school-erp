@@ -1,0 +1,201 @@
+/*
+ * Public school website - theme tokens. Har theme sirf variables badalta hai,
+ * markup ek hi hai. App ke light/dark mode se ye alag hai.
+ */
+.site {
+    --s-font: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--s-bg);
+    color: var(--s-text);
+    min-height: 100vh;
+    overflow-x: clip;
+}
+.site h1,
+.site h2,
+.site h3,
+.site .s-heading {
+    font-family: var(--s-font);
+    letter-spacing: -0.02em;
+}
+
+/* ---------- Emerald (light) ---------- */
+.site[data-theme='emerald'] {
+    --s-bg: #f6faf8;
+    --s-bg-2: #ecf6f1;
+    --s-surface: #ffffff;
+    --s-surface-2: #f3f8f5;
+    --s-border: #dbe8e2;
+    --s-text: #0b2a22;
+    --s-muted: #587069;
+    --s-primary: #059669;
+    --s-primary-soft: #d9f3e8;
+    --s-on-grad: #ffffff;
+    --s-grad: linear-gradient(100deg, #047857 0%, #059669 45%, #34d399 100%);
+    --s-glow: rgba(5, 150, 105, 0.28);
+    --s-nav: rgba(246, 250, 248, 0.82);
+    --s-hero: radial-gradient(60% 60% at 80% 30%, rgba(52, 211, 153, 0.22), transparent 70%),
+        radial-gradient(40% 50% at 10% 10%, rgba(5, 150, 105, 0.1), transparent 70%);
+    --s-grid: rgba(5, 150, 105, 0.07);
+    --s-shadow: 0 1px 2px rgba(11, 42, 34, 0.04), 0 12px 32px -12px rgba(11, 42, 34, 0.14);
+}
+
+/* ---------- Midnight Neon (dark) ---------- */
+.site[data-theme='midnight'] {
+    --s-bg: #0a0918;
+    --s-bg-2: #0e0c22;
+    --s-surface: rgba(255, 255, 255, 0.035);
+    --s-surface-2: rgba(255, 255, 255, 0.06);
+    --s-border: rgba(255, 255, 255, 0.09);
+    --s-text: #ecebf8;
+    --s-muted: #a4a1c2;
+    --s-primary: #c084fc;
+    --s-primary-soft: rgba(192, 132, 252, 0.14);
+    --s-on-grad: #1a1033;
+    --s-grad: linear-gradient(100deg, #c084fc 0%, #f472b6 50%, #fdba74 100%);
+    --s-glow: rgba(168, 85, 247, 0.45);
+    --s-nav: rgba(10, 9, 24, 0.72);
+    --s-hero: radial-gradient(55% 60% at 78% 45%, rgba(147, 51, 234, 0.35), transparent 70%),
+        radial-gradient(35% 40% at 85% 85%, rgba(236, 72, 153, 0.18), transparent 70%),
+        radial-gradient(40% 40% at 5% 0%, rgba(99, 102, 241, 0.12), transparent 70%);
+    --s-grid: rgba(255, 255, 255, 0.035);
+    --s-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04), 0 20px 50px -20px rgba(0, 0, 0, 0.8);
+    color-scheme: dark;
+}
+
+/* ---------- Royal Classic ---------- */
+.site[data-theme='royal'] {
+    --s-bg: #f7f8fc;
+    --s-bg-2: #eef1fa;
+    --s-surface: #ffffff;
+    --s-surface-2: #f3f5fb;
+    --s-border: #dde2f0;
+    --s-text: #0f1b3d;
+    --s-muted: #5a6585;
+    --s-primary: #1e3a8a;
+    --s-primary-soft: #e3e9fb;
+    --s-on-grad: #ffffff;
+    --s-grad: linear-gradient(100deg, #1e3a8a 0%, #2563eb 60%, #d97706 100%);
+    --s-glow: rgba(30, 58, 138, 0.28);
+    --s-nav: rgba(247, 248, 252, 0.85);
+    --s-hero: radial-gradient(55% 60% at 80% 30%, rgba(37, 99, 235, 0.16), transparent 70%),
+        radial-gradient(30% 40% at 90% 90%, rgba(245, 158, 11, 0.16), transparent 70%);
+    --s-grid: rgba(30, 58, 138, 0.06);
+    --s-shadow: 0 1px 2px rgba(15, 27, 61, 0.05), 0 12px 32px -12px rgba(15, 27, 61, 0.16);
+}
+
+/* ---------- Sunrise Warm ---------- */
+.site[data-theme='sunrise'] {
+    --s-bg: #fffaf5;
+    --s-bg-2: #fff1e6;
+    --s-surface: #ffffff;
+    --s-surface-2: #fff6ee;
+    --s-border: #f5e1d2;
+    --s-text: #2d1609;
+    --s-muted: #7a5a48;
+    --s-primary: #ea580c;
+    --s-primary-soft: #ffe6d5;
+    --s-on-grad: #ffffff;
+    --s-grad: linear-gradient(100deg, #ea580c 0%, #f97316 45%, #f43f5e 100%);
+    --s-glow: rgba(234, 88, 12, 0.3);
+    --s-nav: rgba(255, 250, 245, 0.85);
+    --s-hero: radial-gradient(55% 60% at 80% 30%, rgba(251, 146, 60, 0.22), transparent 70%),
+        radial-gradient(35% 40% at 5% 10%, rgba(244, 63, 94, 0.1), transparent 70%);
+    --s-grid: rgba(234, 88, 12, 0.06);
+    --s-shadow: 0 1px 2px rgba(45, 22, 9, 0.05), 0 12px 32px -12px rgba(45, 22, 9, 0.16);
+}
+
+/* ---------- Helpers ---------- */
+.s-grad-text {
+    background: var(--s-grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+.s-btn-grad {
+    background: var(--s-grad);
+    color: var(--s-on-grad);
+    box-shadow: 0 10px 30px -10px var(--s-glow);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.s-btn-grad:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 16px 36px -10px var(--s-glow);
+}
+.s-card {
+    background: var(--s-surface);
+    border: 1px solid var(--s-border);
+    box-shadow: var(--s-shadow);
+}
+.s-input {
+    width: 100%;
+    background: var(--s-surface);
+    border: 1px solid var(--s-border);
+    color: var(--s-text);
+    border-radius: 12px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.925rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.site[data-theme='midnight'] .s-input {
+    background: rgba(7, 6, 18, 0.7);
+}
+.s-input::placeholder {
+    color: var(--s-muted);
+    opacity: 0.75;
+}
+.s-input:focus {
+    border-color: var(--s-primary);
+    box-shadow: 0 0 0 3px var(--s-primary-soft), 0 0 24px -6px var(--s-glow);
+}
+.s-grid-bg {
+    background-image: linear-gradient(var(--s-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--s-grid) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse at 70% 40%, #000 30%, transparent 75%);
+}
+.s-float {
+    animation: s-float 6s ease-in-out infinite;
+}
+.s-float-slow {
+    animation: s-float 9s ease-in-out infinite;
+}
+@keyframes s-float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+.s-spin-slow {
+    animation: s-spin 40s linear infinite;
+}
+@keyframes s-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+.s-reveal {
+    animation: s-reveal 0.7s ease both;
+}
+@keyframes s-reveal {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .s-float,
+    .s-float-slow,
+    .s-spin-slow,
+    .s-reveal {
+        animation: none;
+    }
+}

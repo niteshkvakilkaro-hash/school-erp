@@ -10,6 +10,7 @@
     "db:reset": "npm --prefix backend run db:reset",
     "dev": "concurrently -n api,web -c green,cyan \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
     "dev:all": "concurrently -n api,web,app -c green,cyan,magenta \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\" \"npm --prefix mobile start\"",
+    "dev:phone": "concurrently -n api,web,app -c green,cyan,magenta \"npm --prefix backend run dev\" \"npm --prefix frontend run dev:lan\" \"npm --prefix mobile run start:lan\"",
     "dev:api": "npm --prefix backend run dev",
     "dev:web": "npm --prefix frontend run dev",
     "dev:app": "npm --prefix mobile start",

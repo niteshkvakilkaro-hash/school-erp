@@ -19,7 +19,7 @@ export const TRANSITIONS = {
     withdrawn: ['enquiry'],
     admitted: [],
 };
-const OPEN = ['enquiry', 'applied', 'interview', 'approved'];
+export const OPEN = ['enquiry', 'applied', 'interview', 'approved'];
 
 const today = () => new Date().toISOString().slice(0, 10);
 const emptyToNull = (v) => (v === '' || v === undefined ? null : v);
@@ -108,7 +108,7 @@ function shape(a, d = today()) {
 }
 
 /** ENQ2026-0001 jaisa agla number. */
-async function nextNumber(Model, field, prefix, schoolId, t) {
+export async function nextNumber(Model, field, prefix, schoolId, t) {
     const last = await Model.findOne({
         where: { schoolId, [field]: { [Op.like]: prefix + '%' } },
         order: [[field, 'DESC']],

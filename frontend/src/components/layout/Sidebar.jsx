@@ -20,6 +20,7 @@ import {
     Building2,
     CreditCard,
     Settings,
+    Globe,
     X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -94,6 +95,7 @@ const SCHOOL_GROUPS = [
         items: [
             { to: '/roles', label: 'Roles & Permissions', icon: ShieldCheck, perm: ['roles.view', 'roles.manage'] },
             { to: '/settings', label: 'School Settings', icon: Settings, perm: ['school.settings.view'] },
+            { to: '/website', label: 'Website', icon: Globe, perm: ['website.manage'] },
         ],
     },
 ];

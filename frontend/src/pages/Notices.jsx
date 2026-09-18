@@ -43,6 +43,7 @@ const BLANK = {
     expiresOn: '',
     eventDate: '',
     isPublished: true,
+    showOnWebsite: false,
 };
 
 export default function Notices() {
@@ -113,6 +114,7 @@ export default function Notices() {
                       expiresOn: toDateInput(n.expiresOn),
                       eventDate: toDateInput(n.eventDate),
                       isPublished: n.isPublished,
+                      showOnWebsite: Boolean(n.showOnWebsite),
                   }
                 : BLANK
         );
@@ -463,6 +465,16 @@ export default function Notices() {
                             className="h-4 w-4 rounded border-input accent-[var(--primary)]"
                         />
                         Publish kijiye (uncheck = draft, kisi ko nahi dikhega)
+                    </label>
+
+                    <label className="flex items-center gap-2.5 text-sm text-foreground">
+                        <input
+                            type="checkbox"
+                            checked={form.showOnWebsite}
+                            onChange={set('showOnWebsite')}
+                            className="h-4 w-4 rounded border-input accent-[var(--primary)]"
+                        />
+                        School website par bhi dikhaiye (sabke liye public)
                     </label>
 
                     <button type="submit" className="hidden" />
