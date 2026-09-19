@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { Op, fn, col, literal } from 'sequelize';
 import {
-    sequelize, FeeHead, StudentFee, FeePayment, Student, SchoolClass, Section, User,
+    sequelize, FeeHead, StudentFee, FeePayment, Student, SchoolClass, Section, User, School,
 } from '../models/index.js';
 import { PAYMENT_MODES } from '../models/FeePayment.js';
 import ApiError from '../utils/ApiError.js';
@@ -11,7 +11,7 @@ import { scopedWhere, findScoped, assertSameTenant } from '../utils/tenant.js';
 
 const dateStr = z.coerce.date().transform((d) => d.toISOString().slice(0, 10));
 const today = () => new Date().toISOString().slice(0, 10);
-const money = (v) => Math.round(Number(v || 0) * 100) / 100;
+export const money = (v) => Math.round(Number(v || 0) * 100) / 100;
 
 export const assignSchema = z.object({
     feeHeadIds: z.array(z.coerce.number().int().positive()).min(1, 'Kam se kam ek fee head chuniye'),
@@ -60,17 +60,70 @@ function statusFor(fee) {
     return 'partial';
 }
 
-/** RCPT2026-0001 jaisa agla receipt number. */
-async function nextReceiptNo(req, transaction) {
+/** RCPT2026-0001 jaisa agla receipt number. Transaction me school row lock ke baad hi. */
+async function nextReceiptNo(schoolId, transaction) {
     const prefix = 'RCPT' + new Date().getFullYear() + '-';
     const last = await FeePayment.findOne({
-        where: scopedWhere(req, { receiptNo: { [Op.like]: prefix + '%' } }),
+        where: { schoolId, receiptNo: { [Op.like]: prefix + '%' } },
         order: [['receiptNo', 'DESC']],
         attributes: ['receiptNo'],
         transaction,
     });
     const seq = last ? Number.parseInt(last.receiptNo.slice(prefix.length), 10) || 0 : 0;
     return prefix + String(seq + 1).padStart(4, '0');
+}
+
+/**
+ * Ek fee line par payment - counter aur online dono yahi use karte hain.
+ * School row (receipt number) aur fee row (pending) dono lock hote hain, taaki
+ * ek saath aaye do payment fee ko zyada na bhar dein. Transaction ke andar hi chalaiye.
+ * maxOnly = true: pending se zyada aaya to utna hi lagao (online), warna error (counter).
+ */
+export async function recordPayment({ schoolId, studentFeeId, amount, mode, reference, paidOn, collectedById, remarks, maxOnly = false }, t) {
+    await School.findByPk(schoolId, { lock: t.LOCK.UPDATE, transaction: t, attributes: ['id'] });
+    const fee = await StudentFee.findOne({
+        where: { id: studentFeeId, schoolId },
+        include: [{ model: FeeHead, as: 'feeHead', attributes: ['name'] }],
+        lock: t.LOCK.UPDATE,
+        transaction: t,
+    });
+    if (!fee) throw ApiError.notFound('Fee line nahi mili');
+    if (fee.status === 'waived') {
+        if (maxOnly) return { payment: null, fee, applied: 0, pending: 0 };
+        throw ApiError.badRequest('Ye fee waive ki ja chuki hai');
+    }
+    const pending = money(Number(fee.amount) - Number(fee.discount) - Number(fee.paidAmount));
+    let applied = money(amount);
+    if (applied > pending) {
+        if (!maxOnly) {
+            throw ApiError.badRequest(
+                pending <= 0 ? 'Is fee ka poora payment ho chuka hai' : 'Amount pending se zyada nahi ho sakta (pending: ' + pending + ')',
+                [{ field: 'amount', message: 'Zyada se zyada ' + pending }]
+            );
+        }
+        applied = Math.max(0, pending);
+    }
+    if (applied <= 0) return { payment: null, fee, applied: 0, pending };
+
+    const payment = await FeePayment.create(
+        {
+            schoolId,
+            studentId: fee.studentId,
+            studentFeeId: fee.id,
+            receiptNo: await nextReceiptNo(schoolId, t),
+            amount: applied,
+            mode,
+            reference: reference || null,
+            paidOn: paidOn || today(),
+            collectedById: collectedById || null,
+            remarks: remarks || null,
+        },
+        { transaction: t }
+    );
+    fee.paidAmount = money(Number(fee.paidAmount) + applied);
+    fee.status = statusFor(fee);
+    await fee.save({ transaction: t });
+    return { payment, fee, applied, pending };
 }
 
 /**
@@ -336,47 +389,13 @@ export const studentLedger = asyncHandler(async (req, res) => {
  */
 export const collect = asyncHandler(async (req, res) => {
     const { studentFeeId, amount, mode, reference, paidOn, remarks } = req.body;
+    // Online payment sirf gateway se aata hai - counter par "online" mode nahi
+    if (mode === 'online') throw ApiError.badRequest('Online mode sirf gateway payment ke liye hai');
+    await findScoped(StudentFee, req, studentFeeId);
 
-    const fee = await findScoped(StudentFee, req, studentFeeId, {
-        include: [{ model: FeeHead, as: 'feeHead', attributes: ['name'] }],
-    });
-
-    if (fee.status === 'waived') throw ApiError.badRequest('Ye fee waive ki ja chuki hai');
-
-    const pending = money(Number(fee.amount) - Number(fee.discount) - Number(fee.paidAmount));
-    if (pending <= 0) throw ApiError.badRequest('Is fee ka poora payment ho chuka hai');
-
-    if (money(amount) > pending) {
-        throw ApiError.badRequest('Amount pending se zyada nahi ho sakta (pending: ' + pending + ')', [
-            { field: 'amount', message: 'Zyada se zyada ' + pending },
-        ]);
-    }
-
-    const payment = await sequelize.transaction(async (t) => {
-        const receiptNo = await nextReceiptNo(req, t);
-
-        const created = await FeePayment.create(
-            {
-                schoolId: req.schoolId,
-                studentId: fee.studentId,
-                studentFeeId: fee.id,
-                receiptNo,
-                amount: money(amount),
-                mode,
-                reference: reference || null,
-                paidOn: paidOn || today(),
-                collectedById: req.user.id,
-                remarks: remarks || null,
-            },
-            { transaction: t }
-        );
-
-        fee.paidAmount = money(Number(fee.paidAmount) + money(amount));
-        fee.status = statusFor(fee);
-        await fee.save({ transaction: t });
-
-        return created;
-    });
+    const { payment, fee, pending } = await sequelize.transaction((t) =>
+        recordPayment({ schoolId: req.schoolId, studentFeeId, amount, mode, reference, paidOn, collectedById: req.user.id, remarks }, t)
+    );
 
     res.status(201).json({
         success: true,

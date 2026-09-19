@@ -46,7 +46,7 @@ async function accessibleStudents(req) {
     });
 }
 
-async function assertAccess(req, studentId) {
+export async function assertAccess(req, studentId) {
     const list = await accessibleStudents(req);
     const student = list.find((s) => String(s.id) === String(studentId));
     if (!student) throw ApiError.forbidden('Ye record aapse juda hua nahi hai');

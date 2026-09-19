@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import * as ctrl from '../controllers/portal.controller.js';
+import * as pay from '../controllers/onlinePayment.controller.js';
+import { validate } from '../middleware/validate.js';
 import { authenticate, resolveTenant, requireTenant, can } from '../middleware/auth.js';
 
 const router = Router();
@@ -21,5 +23,10 @@ router.get('/students/:studentId/notices', ctrl.studentNotices);
 router.get('/students/:studentId/library', ctrl.studentLibrary);
 router.get('/students/:studentId/transport', ctrl.studentTransport);
 router.get('/students/:studentId/exams/:examId/result', ctrl.studentResultCard);
+
+// ---- Fees online bharna ----
+router.get('/students/:studentId/pay-options', pay.payOptions(ctrl.assertAccess));
+router.post('/students/:studentId/pay', validate({ body: pay.checkoutSchema }), pay.checkout(ctrl.assertAccess));
+router.get('/students/:studentId/pay/:ref', pay.orderStatus(ctrl.assertAccess));
 
 export default router;

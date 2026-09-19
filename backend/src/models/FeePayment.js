@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../config/database.js';
 
-export const PAYMENT_MODES = ['cash', 'upi', 'card', 'netbanking', 'cheque', 'dd'];
+export const PAYMENT_MODES = ['cash', 'upi', 'card', 'netbanking', 'cheque', 'dd', 'online'];
 
 /** Ek payment receipt - kaunsi fee ke against, kitna, kis mode se. */
 const FeePayment = sequelize.define(

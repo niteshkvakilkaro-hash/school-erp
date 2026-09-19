@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Search, Wallet, IndianRupee, TrendingUp, AlertCircle, Settings2, Plus } from 'lucide-react';
+import { Search, Wallet, IndianRupee, TrendingUp, AlertCircle, Settings2, Plus, Smartphone } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -15,6 +15,7 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { StudentLedger } from '@/components/fees/StudentLedger';
 import { FeeHeadsModal } from '@/components/fees/FeeHeadsModal';
 import { AssignFeesModal } from '@/components/fees/AssignFeesModal';
+import { OnlinePaymentsModal } from '@/components/fees/OnlinePaymentsModal';
 import { formatCurrency } from '@/lib/utils';
 
 const STATUS_VARIANT = { paid: 'success', partial: 'warning', pending: 'danger', none: 'muted' };
@@ -37,6 +38,7 @@ export default function Fees() {
     const [ledgerFor, setLedgerFor] = useState(null);
     const [headsOpen, setHeadsOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
+    const [onlineOpen, setOnlineOpen] = useState(false);
 
     const search = useDebounce(searchInput, 400);
 
@@ -86,7 +88,11 @@ export default function Fees() {
                 title="Fees & Payments"
                 subtitle="Dues, collection aur receipts - sab ek jagah"
                 actions={
-                    canManage ? (
+                    <>
+                        <Button variant="outline" onClick={() => setOnlineOpen(true)}>
+                            <Smartphone /> Online payments
+                        </Button>
+                        {canManage ? (
                         <>
                             <Button variant="outline" onClick={() => setHeadsOpen(true)}>
                                 <Settings2 /> Fee heads
@@ -95,7 +101,8 @@ export default function Fees() {
                                 <Plus /> Assign fees
                             </Button>
                         </>
-                    ) : null
+                        ) : null}
+                    </>
                 }
             />
 
@@ -261,6 +268,7 @@ export default function Fees() {
 
             <FeeHeadsModal open={headsOpen} onOpenChange={setHeadsOpen} onChanged={refreshAll} />
 
+            <OnlinePaymentsModal open={onlineOpen} onClose={() => { setOnlineOpen(false); refreshAll(); }} canManage={canManage} />
             <AssignFeesModal
                 open={assignOpen}
                 onOpenChange={setAssignOpen}

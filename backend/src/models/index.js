@@ -36,6 +36,8 @@ import SiteMedia from './SiteMedia.js';
 import HrSetting from './HrSetting.js';
 import StaffAttendance from './StaffAttendance.js';
 import LeaveRequest from './LeaveRequest.js';
+import PaymentSetting from './PaymentSetting.js';
+import PaymentOrder from './PaymentOrder.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -46,7 +48,7 @@ const TENANT_MODELS = [
     Role, Subscription, Attendance, Homework, Exam, ExamSubject, Mark,
     FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice, Book, BookIssue,
     Vehicle, TransportRoute, RouteStop, StudentTransport, Admission, AdmissionLog, SchoolSite, SiteMedia,
-    HrSetting, StaffAttendance, LeaveRequest,
+    HrSetting, StaffAttendance, LeaveRequest, PaymentSetting, PaymentOrder,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -240,6 +242,11 @@ LeaveRequest.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 LeaveRequest.belongsTo(User, { foreignKey: 'reviewedById', as: 'reviewedBy' });
 User.hasMany(LeaveRequest, { foreignKey: 'userId', as: 'leaves', onDelete: 'CASCADE' });
 
+/* ---------------- Online payments ---------------- */
+
+PaymentOrder.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+Student.hasMany(PaymentOrder, { foreignKey: 'studentId', as: 'paymentOrders', onDelete: 'CASCADE' });
+
 export {
     sequelize,
     School,
@@ -279,4 +286,6 @@ export {
     HrSetting,
     StaffAttendance,
     LeaveRequest,
+    PaymentSetting,
+    PaymentOrder,
 };

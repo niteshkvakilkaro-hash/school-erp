@@ -9,6 +9,7 @@ import routes from './routes/index.js';
 import { notFoundHandler, errorHandler } from './middleware/error.js';
 import { UPLOAD_ROOT } from './utils/upload.js';
 import { mountWebApps } from './webApps.js';
+import { payPage } from './payPage.js';
 
 const allowedOrigins = env.clientUrl.split(',').map((o) => o.trim());
 const LAN_ORIGIN = /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d{1,3}\.\d{1,3}|10\.\d{1,3}\.\d{1,3}\.\d{1,3})(:\d+)?$/;
@@ -24,13 +25,13 @@ app.use(
             directives: {
                 defaultSrc: ["'self'"],
                 // expo-camera (web) ka worker jsQR CDN se laata hai
-                scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+                scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', 'https://checkout.razorpay.com'],
                 styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
                 fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
                 imgSrc: ["'self'", 'data:', 'blob:', 'https:'],
                 mediaSrc: ["'self'", 'blob:'],
-                connectSrc: ["'self'"],
-                frameSrc: ['https://maps.google.com', 'https://www.google.com', 'https://www.youtube-nocookie.com', 'https://player.vimeo.com'],
+                connectSrc: ["'self'", 'https://api.razorpay.com', 'https://lumberjack.razorpay.com'],
+                frameSrc: ['https://maps.google.com', 'https://www.google.com', 'https://www.youtube-nocookie.com', 'https://player.vimeo.com', 'https://api.razorpay.com', 'https://checkout.razorpay.com'],
                 workerSrc: ["'self'", 'blob:'],
                 objectSrc: ["'none'"],
                 frameAncestors: ["'self'"],
@@ -50,7 +51,15 @@ app.use(
         credentials: true,
     })
 );
-app.use(express.json({ limit: '2mb' }));
+app.use(
+    express.json({
+        limit: '2mb',
+        // Razorpay webhook ka signature raw body par hota hai
+        verify: (req, _res, buf) => {
+            if (req.originalUrl.startsWith('/api/public/payments/')) req.rawBody = buf.toString('utf8');
+        },
+    })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(compression());
 
@@ -72,6 +81,9 @@ app.use(
 );
 
 app.use('/api', routes);
+
+// Fees ka payment page (app / APK isi ko kholti hai)
+app.get(/^\/pay\/[a-f0-9]{48}$/, payPage);
 
 export const webApps = mountWebApps(app);
 
