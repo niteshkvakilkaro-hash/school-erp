@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Search, Pencil, Trash2, RotateCcw } from 'lucide-react';
+import { Plus, Search, Pencil, Trash2, RotateCcw, FileSpreadsheet } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -14,6 +14,7 @@ import { Badge, StatusBadge } from '@/components/ui/badge';
 import { ConfirmDialog } from '@/components/ui/modal';
 import { Pagination } from '@/components/ui/pagination';
 import { StudentForm } from './StudentForm';
+import { ImportStudentsModal } from '@/components/students/ImportStudentsModal';
 import { formatDate, fullName, titleCase } from '@/lib/utils';
 
 const EMPTY_FILTERS = { search: '', classId: '', sectionId: '', status: '', sort: 'newest' };
@@ -26,6 +27,7 @@ export default function Students() {
     const canAct = canCreate || canEdit || canDelete;
 
     const [items, setItems] = useState([]);
+    const [importOpen, setImportOpen] = useState(false);
     const [meta, setMeta] = useState(null);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
@@ -100,14 +102,19 @@ export default function Students() {
                 subtitle={meta ? meta.total + ' students registered' : 'Loading...'}
                 actions={
                     canCreate ? (
-                        <Button
-                            onClick={() => {
-                                setEditing(null);
-                                setFormOpen(true);
-                            }}
-                        >
-                            <Plus /> New admission
-                        </Button>
+                        <>
+                            <Button variant="outline" onClick={() => setImportOpen(true)}>
+                                <FileSpreadsheet /> Excel import
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setEditing(null);
+                                    setFormOpen(true);
+                                }}
+                            >
+                                <Plus /> New admission
+                            </Button>
+                        </>
                     ) : null
                 }
             />
@@ -260,6 +267,8 @@ export default function Students() {
             </TableWrap>
 
             <Pagination meta={meta} onPage={setPage} />
+
+            <ImportStudentsModal open={importOpen} onClose={() => setImportOpen(false)} onImported={load} />
 
             <StudentForm
                 open={formOpen}

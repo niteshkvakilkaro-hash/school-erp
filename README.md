@@ -171,6 +171,16 @@ Selfie `backend/private/` me rehti hai - static serve **nahi** hoti; sirf HR dek
 > Face *matching* (selfie asli usi insaan ki hai ya nahi) abhi nahi hai - admin selfie dekh kar verify karta hai.
 > Iske liye AWS Rekognition / Azure Face jaisi service jodni padegi.
 
+## Excel se students (bulk import)
+
+Students → **Excel import**. `.xlsx` ya `.csv`, ek baar me 2000 tak (5 MB).
+
+1. **Template** download (school ki classes/sections ke saath, Gender/Class dropdown, Example + Help sheet). Apni purani Excel bhi chalti hai - column naam milte-julte hon to (Name, Std, Div, Mobile, Father Name, DOB...). Upar title rows ho to bhi header dhoondh leta hai.
+2. **Preview** - kuch save nahi hota. Har row ki jaanch: class/section (`5`, `5th`, `Class 5`, `V` sab), ek hi section ho to apne aap, DD-MM-YYYY / Excel date, 10 digit mobile, email, admission no file me ya school me pehle se, gender. Chetavni: mobile nahi, umar ajeeb, roll no dohraya, bachcha shayad pehle se hai.
+3. **Import** - ek transaction me sab ya kuch nahi. Galti ho to rukta hai, ya "sirf sahi rows" chuniye. Plan ki student limit poori file par. Admission no khaali = `ADM<saal>-NNNN`.
+
+**Parent login** (optional): ek mobile = ek parent (bhai-behen ek hi login me). Mobile/email wala parent pehle se ho to usi se jud jata hai. Email na ho to `<mobile>@<schoolcode>.erpsc`. Password list sirf import ke baad ek baar dikhti hai (CSV download); parent OTP se khud bhi bana sakte hain.
+
 ## Password bhool gaye (OTP)
 
 Admin panel aur app dono ke login par **"Password bhool gaye?"** → email → registered mobile par 6 digit OTP → naya password.
