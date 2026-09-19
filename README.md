@@ -171,6 +171,19 @@ Selfie `backend/private/` me rehti hai - static serve **nahi** hoti; sirf HR dek
 > Face *matching* (selfie asli usi insaan ki hai ya nahi) abhi nahi hai - admin selfie dekh kar verify karta hai.
 > Iske liye AWS Rekognition / Azure Face jaisi service jodni padegi.
 
+## Naya session / promotion
+
+Academics → **Naya session** (`sessions.manage` - School Admin, Principal).
+
+1. Session: `2026-27` → `2027-28` (agla hi, beech ka saal chhod nahi sakte).
+2. Har class kahan jayegi - default level ke hisaab se agli class, sabse upar wali **Pass out (Alumni)**. Section: same naam wala, ya target me ek hi section ho to wahi, ya haath se chuniye.
+3. Kisi bachche ko **Roko** (usi class me), **Chhod diya** (inactive) ya **Pass out** - har bachche ke saath baaki fees bhi dikhti hai.
+4. Pakka karne ke liye session ka naam likhna padta hai. Optional: roll number khaali.
+
+Ek transaction me sab. Attendance, marks, fees, homework ki purani entries waisi hi rehti hain (wo tareekh / class ke saath save hain) - sirf student ki class / section / status badalta hai. Har student ka snapshot `student_enrollments` me (kis session me kis class me tha, kya hua) - `GET /api/sessions/students/:id/history`.
+
+**Undo**: sirf aakhri promotion, 30 din tak. Jin bachchon ki class promotion ke baad haath se badli gayi unhe nahi chhedta (list wapas milti hai). Ek saath do promotion nahi chal sakte (school row lock).
+
 ## Excel se students (bulk import)
 
 Students → **Excel import**. `.xlsx` ya `.csv`, ek baar me 2000 tak (5 MB).

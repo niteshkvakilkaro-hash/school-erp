@@ -14,6 +14,7 @@ import {
     Wallet,
     Megaphone,
     MessageSquareText,
+    CalendarPlus,
     Library,
     Bus,
     ShieldCheck,
@@ -79,6 +80,7 @@ const SCHOOL_GROUPS = [
             { to: '/attendance', label: 'Attendance', icon: ClipboardCheck, perm: ['attendance.view', 'attendance.mark'] },
             { to: '/homework', label: 'Homework', icon: NotebookPen, perm: ['homework.view'] },
             { to: '/exams', label: 'Exams & Results', icon: FileSpreadsheet, perm: ['exams.view'] },
+            { to: '/promotion', label: 'Naya session', icon: CalendarPlus, perm: ['sessions.manage'] },
         ],
     },
     {

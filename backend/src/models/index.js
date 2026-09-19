@@ -41,6 +41,8 @@ import PaymentOrder from './PaymentOrder.js';
 import MessagingSetting from './MessagingSetting.js';
 import MessageLog from './MessageLog.js';
 import PasswordReset from './PasswordReset.js';
+import PromotionRun from './PromotionRun.js';
+import StudentEnrollment from './StudentEnrollment.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -52,11 +54,17 @@ const TENANT_MODELS = [
     FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice, Book, BookIssue,
     Vehicle, TransportRoute, RouteStop, StudentTransport, Admission, AdmissionLog, SchoolSite, SiteMedia,
     HrSetting, StaffAttendance, LeaveRequest, PaymentSetting, PaymentOrder,
-    MessagingSetting, MessageLog,
+    MessagingSetting, MessageLog, PromotionRun, StudentEnrollment,
 ];
 // Reset requests user ke saath hi hat jayein (super admin ka schoolId null hota hai)
 User.hasMany(PasswordReset, { foreignKey: 'userId', onDelete: 'CASCADE' });
 PasswordReset.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+PromotionRun.hasMany(StudentEnrollment, { foreignKey: 'runId', as: 'enrollments', onDelete: 'CASCADE' });
+StudentEnrollment.belongsTo(PromotionRun, { foreignKey: 'runId', as: 'run' });
+Student.hasMany(StudentEnrollment, { foreignKey: 'studentId', as: 'enrollments', onDelete: 'CASCADE' });
+StudentEnrollment.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
+PromotionRun.belongsTo(User, { foreignKey: 'createdById', as: 'createdBy' });
 
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -299,4 +307,6 @@ export {
     MessagingSetting,
     MessageLog,
     PasswordReset,
+    PromotionRun,
+    StudentEnrollment,
 };
