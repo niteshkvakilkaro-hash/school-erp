@@ -5,7 +5,7 @@ import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 
 export const signToken = (user) =>
-    jwt.sign({ id: user.id, schoolId: user.schoolId ?? null }, env.jwt.secret, {
+    jwt.sign({ id: user.id, schoolId: user.schoolId ?? null, tv: user.tokenVersion || 0 }, env.jwt.secret, {
         expiresIn: env.jwt.expiresIn,
     });
 
@@ -33,6 +33,10 @@ export const authenticate = asyncHandler(async (req, _res, next) => {
     });
     if (!user) throw ApiError.unauthorized('Account no longer exists');
     if (user.status !== 'active') throw ApiError.forbidden('Aapka account inactive hai');
+    // Password badalne / reset ke baad purane token (dusre phone / browser) band
+    if ((payload.tv || 0) !== (user.tokenVersion || 0)) {
+        throw ApiError.unauthorized('Password badal gaya hai - dobara login kijiye');
+    }
 
     // Suspended school ka koi bhi member andar nahi aa sakta
     if (user.school && user.school.status === 'suspended') {

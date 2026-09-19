@@ -171,6 +171,18 @@ Selfie `backend/private/` me rehti hai - static serve **nahi** hoti; sirf HR dek
 > Face *matching* (selfie asli usi insaan ki hai ya nahi) abhi nahi hai - admin selfie dekh kar verify karta hai.
 > Iske liye AWS Rekognition / Azure Face jaisi service jodni padegi.
 
+## Password bhool gaye (OTP)
+
+Admin panel aur app dono ke login par **"Password bhool gaye?"** → email → registered mobile par 6 digit OTP → naya password.
+
+- OTP user ke `phone` par jaata hai; student ka apna number na ho to guardian ke number par. School ka SMS / WhatsApp provider use hota hai (MSG91 me `otp` template: `##var1##` school, `##var2##` OTP).
+- OTP 10 minute valid, sirf hash save hota hai, message log me `******`. 5 galat try ke baad band, ek baar use ke baad khatam, naya OTP maangte hi purana bekaar.
+- Limit: ek user ko 15 minute me 3 OTP; ek IP se 15 minute me 10 request.
+- Ek email do schools me ho to school chunwaya jata hai.
+- Password badalte hi (reset, "Change password", ya admin ne badla) **baaki saare devices se logout** - token me `tokenVersion` jaata hai.
+- Demo provider par OTP screen par hi dikhta hai (production `NODE_ENV=production` me kabhi nahi). Provider "Band" ho ya number na ho to saaf message: school office se reset karwaiye.
+- Super Admin ka password SMS se reset nahi hota.
+
 ## Online fee payment
 
 - Parent app → **Fees** → fee chuniye → **Pay online** → `/pay/<token>` wala payment page (UPI, card, netbanking). App me koi native payment library nahi.

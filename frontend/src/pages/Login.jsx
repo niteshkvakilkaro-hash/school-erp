@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
+import { ForgotPassword } from '@/components/auth/ForgotPassword';
 import { cn } from '@/lib/utils';
 
 // Left panel ke feature cards - reference design jaisa 2x2 grid
@@ -66,6 +67,8 @@ export default function Login() {
     const [submitting, setSubmitting] = useState(false);
     // Ek email kai schools me ho to pehle school chunwate hain
     const [schoolChoices, setSchoolChoices] = useState(null);
+    const [forgot, setForgot] = useState(false);
+    const [notice, setNotice] = useState('');
 
     if (!loading && isAuthenticated) {
         return <Navigate to={location.state?.from?.pathname || '/'} replace />;
@@ -163,7 +166,18 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {schoolChoices ? (
+                    {forgot ? (
+                        <ForgotPassword
+                            initialEmail={form.email}
+                            onBack={() => setForgot(false)}
+                            onDone={(email) => {
+                                setForm({ email, password: '' });
+                                setError('');
+                                setNotice('Password badal gaya - naye password se sign in kijiye');
+                                setForgot(false);
+                            }}
+                        />
+                    ) : schoolChoices ? (
                         <>
                             <button
                                 onClick={() => setSchoolChoices(null)}
@@ -217,6 +231,12 @@ export default function Login() {
                                 Apne account se sign in kijiye
                             </p>
 
+                            {notice && !error ? (
+                                <div role="status" className="mt-5 rounded-xl border border-primary/30 bg-accent px-4 py-3 text-sm text-accent-foreground">
+                                    {notice}
+                                </div>
+                            ) : null}
+
                             {error ? (
                                 <div className="mt-5 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
                                     {error}
@@ -248,12 +268,24 @@ export default function Login() {
                                 </div>
 
                                 <div className="space-y-1.5">
-                                    <label
-                                        htmlFor="password"
-                                        className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-                                    >
-                                        Password
-                                    </label>
+                                    <div className="flex items-center justify-between">
+                                        <label
+                                            htmlFor="password"
+                                            className="text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+                                        >
+                                            Password
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setError('');
+                                                setForgot(true);
+                                            }}
+                                            className="text-xs font-medium text-primary hover:underline"
+                                        >
+                                            Password bhool gaye?
+                                        </button>
+                                    </div>
                                     <div className="relative">
                                         <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                         <input

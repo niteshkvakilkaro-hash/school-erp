@@ -20,6 +20,9 @@ const User = sequelize.define(
             defaultValue: 'active',
         },
         lastLoginAt: { type: DataTypes.DATE },
+        passwordChangedAt: { type: DataTypes.DATE },
+        // Token me yahi number jaata hai - password badalte hi +1, purane saare login token bekaar
+        tokenVersion: { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
     },
     {
         tableName: 'users',
@@ -31,6 +34,10 @@ const User = sequelize.define(
             beforeSave: async (user) => {
                 if (user.changed('password')) {
                     user.password = await bcrypt.hash(user.password, 10);
+                    if (!user.isNewRecord) {
+                        user.passwordChangedAt = new Date();
+                        user.tokenVersion = (user.tokenVersion || 0) + 1;
+                    }
                 }
                 if (user.changed('email') && user.email) {
                     user.email = user.email.trim().toLowerCase();

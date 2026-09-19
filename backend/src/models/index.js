@@ -40,6 +40,7 @@ import PaymentSetting from './PaymentSetting.js';
 import PaymentOrder from './PaymentOrder.js';
 import MessagingSetting from './MessagingSetting.js';
 import MessageLog from './MessageLog.js';
+import PasswordReset from './PasswordReset.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -53,6 +54,10 @@ const TENANT_MODELS = [
     HrSetting, StaffAttendance, LeaveRequest, PaymentSetting, PaymentOrder,
     MessagingSetting, MessageLog,
 ];
+// Reset requests user ke saath hi hat jayein (super admin ka schoolId null hota hai)
+User.hasMany(PasswordReset, { foreignKey: 'userId', onDelete: 'CASCADE' });
+PasswordReset.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
     Model.belongsTo(School, { foreignKey: 'schoolId', as: 'school' });
@@ -293,4 +298,5 @@ export {
     PaymentOrder,
     MessagingSetting,
     MessageLog,
+    PasswordReset,
 };

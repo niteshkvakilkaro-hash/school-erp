@@ -9,7 +9,8 @@ import { scopedWhere } from '../utils/tenant.js';
 import { encrypt, mask, decrypt } from '../utils/secrets.js';
 import { msgSettingsFor, notify, normalizePhone, TEMPLATES, EVENT_LABELS } from '../services/notify.js';
 
-const TEMPLATE_KEYS = [...MSG_EVENTS, 'test'];
+const TEMPLATE_KEYS = [...MSG_EVENTS, 'otp', 'test'];
+const EXTRA_LABELS = { otp: 'Password reset OTP (hamesha chalu)', test: 'Test message' };
 
 export const getSettings = asyncHandler(async (req, res) => {
     const s = await msgSettingsFor(req.schoolId);
@@ -23,7 +24,7 @@ export const getSettings = asyncHandler(async (req, res) => {
             events: s.events,
             templates: s.templates,
             // UI par event ka naam, sample text aur variables ka kram (template banate waqt kaam aata hai)
-            catalog: TEMPLATE_KEYS.map((k) => ({ key: k, label: EVENT_LABELS[k] || 'Test message', text: TEMPLATES[k].text, vars: TEMPLATES[k].vars })),
+            catalog: TEMPLATE_KEYS.map((k) => ({ key: k, label: EVENT_LABELS[k] || EXTRA_LABELS[k], text: TEMPLATES[k].text, vars: TEMPLATES[k].vars })),
         },
     });
 });

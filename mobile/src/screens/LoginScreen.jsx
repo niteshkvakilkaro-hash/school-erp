@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Button, Input, Title, Subtle, Card } from '../components/ui';
 import { ServerSetting } from '../components/ServerSetting';
+import { ForgotPassword } from '../components/ForgotPassword';
 
 export default function LoginScreen() {
     const { login } = useAuth();
@@ -23,6 +24,8 @@ export default function LoginScreen() {
     const [error, setError] = useState('');
     const [busy, setBusy] = useState(false);
     const [schoolChoices, setSchoolChoices] = useState(null);
+    const [forgot, setForgot] = useState(false);
+    const [notice, setNotice] = useState('');
 
     const attempt = async (schoolCode) => {
         if (!email.trim() || !password) {
@@ -80,7 +83,19 @@ export default function LoginScreen() {
                             gap: 16,
                         }}
                     >
-                        {schoolChoices ? (
+                        {forgot ? (
+                            <ForgotPassword
+                                initialEmail={email}
+                                onBack={() => setForgot(false)}
+                                onDone={(e) => {
+                                    setEmail(e);
+                                    setPassword('');
+                                    setError('');
+                                    setNotice('Password badal gaya - naye password se login kijiye');
+                                    setForgot(false);
+                                }}
+                            />
+                        ) : schoolChoices ? (
                             <>
                                 <TouchableOpacity onPress={() => setSchoolChoices(null)}>
                                     <Subtle>Wapas</Subtle>
@@ -115,6 +130,12 @@ export default function LoginScreen() {
                                 <Title>Welcome back</Title>
                                 <Subtle>Apne account se login kijiye</Subtle>
 
+                                {notice && !error ? (
+                                    <View style={{ backgroundColor: colors.primary + '1A', borderRadius: radius.md, padding: 12 }}>
+                                        <Text style={{ color: colors.primary, fontSize: 13, fontWeight: '600' }}>{notice}</Text>
+                                    </View>
+                                ) : null}
+
                                 {error ? (
                                     <View
                                         style={{
@@ -148,6 +169,17 @@ export default function LoginScreen() {
                                     placeholder="Password"
                                     onSubmitEditing={() => attempt()}
                                 />
+
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        setError('');
+                                        setForgot(true);
+                                    }}
+                                    accessibilityRole="button"
+                                    style={{ alignSelf: 'flex-end', marginTop: -6 }}
+                                >
+                                    <Text style={{ color: colors.primary, fontWeight: '600', fontSize: 13 }}>Password bhool gaye?</Text>
+                                </TouchableOpacity>
 
                                 <Button title="Sign in" loading={busy} onPress={() => attempt()} />
 

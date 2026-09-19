@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import api from '@/lib/api';
+import api, { TOKEN_KEY } from '@/lib/api';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { TextField } from '@/components/ui/field';
@@ -27,11 +27,13 @@ export function ChangePasswordModal({ open, onOpenChange }) {
 
         setSaving(true);
         try {
-            await api.post('/auth/change-password', {
+            const { data } = await api.post('/auth/change-password', {
                 currentPassword: form.currentPassword,
                 newPassword: form.newPassword,
             });
-            toast.success('Password update ho gaya');
+            // Server ne baaki devices ke token band kiye - is browser ko naya token
+            if (data.data?.token) localStorage.setItem(TOKEN_KEY, data.data.token);
+            toast.success('Password update ho gaya - baaki devices se logout');
             close();
         } catch (err) {
             setErrors(err.fieldErrors || {});

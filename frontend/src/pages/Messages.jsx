@@ -22,7 +22,7 @@ const PROVIDERS = [
     ['whatsapp', 'WhatsApp', 'Meta WhatsApp Cloud API templates'],
 ];
 const TONE = { sent: 'success', queued: 'secondary', failed: 'danger', skipped: 'muted' };
-const EVENT_SHORT = { absent: 'Absent', feeReceipt: 'Receipt', feeReminder: 'Reminder', leaveDecision: 'Leave', test: 'Test' };
+const EVENT_SHORT = { absent: 'Absent', feeReceipt: 'Receipt', feeReminder: 'Reminder', leaveDecision: 'Leave', otp: 'OTP', test: 'Test' };
 
 function Settings({ s, canManage, onSaved }) {
     const [form, setForm] = useState(() => ({ provider: s.provider, apiKey: '', senderId: s.senderId || '', events: { ...s.events }, templates: { ...s.templates } }));
@@ -122,8 +122,8 @@ function Settings({ s, canManage, onSaved }) {
 
                 <div className="divide-y divide-border rounded-xl border border-border">
                     {s.catalog.map((c) => {
-                        const isTest = c.key === 'test';
-                        if (isTest && !live) return null;
+                        const isTest = c.key === 'test' || c.key === 'otp'; // inka on/off nahi
+                        if (c.key === 'test' && !live) return null;
                         return (
                             <div key={c.key} className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center">
                                 <div className="min-w-0 flex-1">

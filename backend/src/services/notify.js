@@ -15,6 +15,7 @@ export const TEMPLATES = {
     feeReminder: { vars: ['school', 'student', 'amount'], text: '{school}: {student} ki Rs {amount} fees baaki hai. App se online bhi bhar sakte hain.' },
     leaveDecision: { vars: ['school', 'name', 'dates', 'status'], text: '{school}: {name}, aapki leave ({dates}) {status} ho gayi hai.' },
     test: { vars: ['school'], text: '{school}: ERPSC se test message. Setup sahi hai.' },
+    otp: { vars: ['school', 'otp'], text: '{school}: Password reset OTP {otp} hai. 10 minute tak valid. Ye kisi ko na batayein.' },
 };
 
 export const EVENT_LABELS = {
@@ -100,7 +101,8 @@ async function deliver(s, log, event, phone, vars) {
 
 /**
  * Message bhejo - kaam ka response rukta nahi (background me jata hai).
- * recipients: [{ phone, studentId?, userId?, vars?, dedupeKey? }]
+ * recipients: [{ phone, studentId?, userId?, vars?, logVars?, dedupeKey? }]
+ * logVars = log me dikhne wale variables (jaise OTP ki jagah ******)
  * Event band ho ya provider none ho to kuch nahi hota. `wait: true` = test me await.
  */
 export async function notify(schoolId, event, recipients, { wait = false, force = false } = {}) {
@@ -119,7 +121,7 @@ export async function notify(schoolId, event, recipients, { wait = false, force 
                     event,
                     channel: s.provider === 'msg91' ? 'sms' : s.provider,
                     toPhone: phone || String(r.phone || '').slice(0, 20) || null,
-                    body: render(event, vars).slice(0, 500),
+                    body: render(event, { ...vars, ...(r.logVars || {}) }).slice(0, 500),
                     status: phone ? 'queued' : 'skipped',
                     error: phone ? null : 'Mobile number sahi nahi hai',
                     studentId: r.studentId || null,

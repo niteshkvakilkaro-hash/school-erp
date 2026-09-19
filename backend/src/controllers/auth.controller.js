@@ -188,7 +188,8 @@ export const changePassword = asyncHandler(async (req, res) => {
     user.password = newPassword;
     await user.save();
 
-    res.json({ success: true, message: 'Password update ho gaya' });
+    // Baaki devices ke purane token ab band - is device ko naya token
+    res.json({ success: true, message: 'Password update ho gaya', data: { token: signToken(user) } });
 });
 
 /** Login screen par school dropdown ke liye - public endpoint. */
