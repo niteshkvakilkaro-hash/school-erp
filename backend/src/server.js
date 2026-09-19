@@ -2,6 +2,7 @@ import app from './app.js';
 import { env } from './config/env.js';
 import { connectDatabase } from './config/database.js';
 import './models/index.js';
+import { startScheduler } from './services/backup/index.js';
 
 async function start() {
     try {
@@ -16,6 +17,8 @@ async function start() {
     app.listen(env.port, () => {
         console.log('[api] http://localhost:' + env.port + '/api  (' + env.nodeEnv + ')');
     });
+    // Roz ka backup (BACKUP_ENABLED=false se band)
+    startScheduler();
 }
 
 start();

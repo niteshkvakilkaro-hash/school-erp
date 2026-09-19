@@ -27,6 +27,36 @@ export const env = {
         expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     },
 
+    // Roz ka backup - details README 'Backup' me
+    backup: {
+        enabled: bool(process.env.BACKUP_ENABLED, true),
+        time: process.env.BACKUP_TIME || '02:00', // school timezone me
+        dir: process.env.BACKUP_DIR || '',
+        keepDays: Number(process.env.BACKUP_KEEP_DAYS || 14),
+        password: process.env.BACKUP_PASSWORD || '',
+        mysqldump: process.env.BACKUP_MYSQLDUMP || '',
+        mysql: process.env.BACKUP_MYSQL || '',
+        reportEmail: process.env.BACKUP_REPORT_EMAIL || '',
+        s3: {
+            endpoint: process.env.BACKUP_S3_ENDPOINT || '', // R2: https://<account>.r2.cloudflarestorage.com
+            region: process.env.BACKUP_S3_REGION || 'auto',
+            bucket: process.env.BACKUP_S3_BUCKET || '',
+            accessKey: process.env.BACKUP_S3_ACCESS_KEY || '',
+            secretKey: process.env.BACKUP_S3_SECRET_KEY || '',
+            prefix: process.env.BACKUP_S3_PREFIX || 'erpsc-backups',
+            keepDays: Number(process.env.BACKUP_S3_KEEP_DAYS || 30),
+        },
+    },
+
+    smtp: {
+        host: process.env.SMTP_HOST || '',
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: bool(process.env.SMTP_SECURE, false),
+        user: process.env.SMTP_USER || '',
+        pass: process.env.SMTP_PASS || '',
+        from: process.env.MAIL_FROM || process.env.SMTP_USER || '',
+    },
+
     seed: {
         adminName: process.env.SEED_ADMIN_NAME || 'School Admin',
         adminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@school.com',

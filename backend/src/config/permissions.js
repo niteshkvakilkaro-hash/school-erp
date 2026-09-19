@@ -10,6 +10,7 @@ export const PERMISSIONS = [
     { slug: 'platform.schools.view', module: 'Platform', label: 'Schools ki list dekhna', scope: 'platform' },
     { slug: 'platform.schools.manage', module: 'Platform', label: 'School banana / edit / suspend', scope: 'platform' },
     { slug: 'platform.plans.manage', module: 'Platform', label: 'Plans aur subscriptions manage karna', scope: 'platform' },
+    { slug: 'platform.backups.manage', module: 'Platform', label: 'Backup dekhna, abhi backup lena, download', scope: 'platform' },
 
     // ---- School ----
     { slug: 'dashboard.view', module: 'Dashboard', label: 'School dashboard dekhna' },

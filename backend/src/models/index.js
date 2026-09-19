@@ -43,6 +43,7 @@ import MessageLog from './MessageLog.js';
 import PasswordReset from './PasswordReset.js';
 import PromotionRun from './PromotionRun.js';
 import StudentEnrollment from './StudentEnrollment.js';
+import BackupRun from './BackupRun.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -65,6 +66,7 @@ StudentEnrollment.belongsTo(PromotionRun, { foreignKey: 'runId', as: 'run' });
 Student.hasMany(StudentEnrollment, { foreignKey: 'studentId', as: 'enrollments', onDelete: 'CASCADE' });
 StudentEnrollment.belongsTo(Student, { foreignKey: 'studentId', as: 'student' });
 PromotionRun.belongsTo(User, { foreignKey: 'createdById', as: 'createdBy' });
+BackupRun.belongsTo(User, { foreignKey: 'startedById', as: 'startedBy', constraints: false });
 
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -309,4 +311,5 @@ export {
     PasswordReset,
     PromotionRun,
     StudentEnrollment,
+    BackupRun,
 };

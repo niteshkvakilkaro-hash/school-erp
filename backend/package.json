@@ -10,7 +10,9 @@
     "start": "node src/server.js",
     "db:sync": "node src/seed/sync.js",
     "db:seed": "node src/seed/seed.js",
-    "db:reset": "node src/seed/seed.js --force"
+    "db:reset": "node src/seed/seed.js --force",
+    "backup:now": "node src/scripts/backup-now.js",
+    "backup:restore": "node src/scripts/restore-backup.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -25,8 +27,10 @@
     "morgan": "^1.10.0",
     "multer": "^2.4.0",
     "mysql2": "^3.11.0",
+    "nodemailer": "^7.0.13",
     "sequelize": "^6.37.3",
     "sharp": "^0.34.5",
+    "tar": "^7.5.22",
     "zod": "^3.23.8"
   },
   "devDependencies": {

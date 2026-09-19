@@ -31,6 +31,7 @@ import SchoolSettings from '@/pages/SchoolSettings';
 import PlatformDashboard from '@/pages/platform/PlatformDashboard';
 import Schools from '@/pages/platform/Schools';
 import Plans from '@/pages/platform/Plans';
+import Backups from '@/pages/platform/Backups';
 import NotFound from '@/pages/NotFound';
 
 /**
@@ -74,6 +75,14 @@ export default function App() {
                                 element={
                                     <ProtectedRoute platform permissions={['platform.schools.view']}>
                                         <Schools />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="platform/backups"
+                                element={
+                                    <ProtectedRoute platform permissions={['platform.backups.manage']}>
+                                        <Backups />
                                     </ProtectedRoute>
                                 }
                             />

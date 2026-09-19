@@ -4,3 +4,5 @@ logs/
 *.log
 uploads/
 private/
+backups/
+backup-work/

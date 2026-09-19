@@ -15,6 +15,7 @@ import {
     Megaphone,
     MessageSquareText,
     CalendarPlus,
+    DatabaseBackup,
     Library,
     Bus,
     ShieldCheck,
@@ -47,6 +48,10 @@ const PLATFORM_GROUPS = [
             { to: '/platform/schools', label: 'Schools', icon: Building2, perm: ['platform.schools.view'] },
             { to: '/platform/plans', label: 'Plans', icon: CreditCard, perm: ['platform.plans.manage'] },
         ],
+    },
+    {
+        title: 'System',
+        items: [{ to: '/platform/backups', label: 'Backups', icon: DatabaseBackup, perm: ['platform.backups.manage'] }],
     },
 ];
 

@@ -171,6 +171,26 @@ Selfie `backend/private/` me rehti hai - static serve **nahi** hoti; sirf HR dek
 > Face *matching* (selfie asli usi insaan ki hai ya nahi) abhi nahi hai - admin selfie dekh kar verify karta hai.
 > Iske liye AWS Rekognition / Azure Face jaisi service jodni padegi.
 
+## Backup
+
+Roz raat (`BACKUP_TIME`, default 02:00 school time) apne aap: **database (mysqldump) + `uploads/` + `private/`** → `.tar.gz` → **AES-256-GCM encrypt** (`BACKUP_PASSWORD`) → khol kar jaanch → `backend/backups/` → cloud (agar set) → purane hatao → report email. Server raat ko band tha to chalu hote hi le leta hai; fail ho to din me 3 baar tak dobara.
+
+- **Super Admin → Backups**: aakhri backup, setup ki kami (password / cloud / email), "Abhi backup lijiye", har backup ka download.
+- **Cloud**: koi bhi S3-compatible - Cloudflare R2 (10 GB free), Backblaze B2, AWS S3, Wasabi. `.env` me `BACKUP_S3_*` (dekhiye `.env.example`). Cloud fail ho to bhi server wala backup rehta hai aur report me chetavni aati hai.
+- **Kitne din**: server par `BACKUP_KEEP_DAYS` (14), cloud par `BACKUP_S3_KEEP_DAYS` (30); sabse naye 3 hamesha.
+- **Report**: `BACKUP_REPORT_EMAIL` par roz OK / FAIL (file email me nahi jaati). SMTP (`SMTP_*`, Gmail ke liye App password) set na ho to mail `backups/outbox.log` me.
+- Terminal: `npm run backup:now`
+
+**Wapas laana** (server par, API band karke):
+
+```bash
+npm run backup:restore -- backups/<file>.erpscbk --verify            # sirf jaanch
+npm run backup:restore -- backups/<file>.erpscbk --db erpsc_check    # alag DB me dekhiye
+npm run backup:restore -- backups/<file>.erpscbk --yes --files       # LIVE DB + photos/selfies
+```
+
+> `BACKUP_PASSWORD` zaroor set kijiye aur server ke bahar bhi likh kar rakhiye - iske bina backup nahi khulta. Khaali ho to JWT_SECRET se banta hai (tab wahi `.env` chahiye).
+
 ## Naya session / promotion
 
 Academics → **Naya session** (`sessions.manage` - School Admin, Principal).

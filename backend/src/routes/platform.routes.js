@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as ctrl from '../controllers/platform.controller.js';
+import * as backup from '../controllers/backup.controller.js';
 import { authenticate, platformOnly, can } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 
@@ -25,5 +26,9 @@ router.post(
     validate({ body: ctrl.subscriptionSchema }),
     ctrl.createSubscription
 );
+
+router.get('/backups', can('platform.backups.manage'), backup.overview);
+router.post('/backups', can('platform.backups.manage'), backup.start);
+router.get('/backups/:id/download', can('platform.backups.manage'), backup.download);
 
 export default router;
