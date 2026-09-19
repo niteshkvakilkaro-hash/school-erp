@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { sequelize, PaymentSetting, PaymentOrder, Student, FeeHead, StudentFee } from '../models/index.js';
 import ApiError from '../utils/ApiError.js';
 import { decrypt, safeEqual } from '../utils/secrets.js';
-import { recordPayment, money } from '../controllers/fee.controller.js';
+import { recordPayment, money, receiptMessage } from '../controllers/fee.controller.js';
 
 // Test me mock server par bhejne ke liye override
 const RZP_API = () => process.env.RAZORPAY_API_BASE || 'https://api.razorpay.com/v1';
@@ -135,7 +135,16 @@ export async function createOrder({ schoolId, studentId, studentFeeIds, userId }
  * verify aur webhook dono aa jayein tab bhi receipt ek hi baar banti hai.
  * Beech me counter par bhar diya ho to jitna bacha utna hi lagta hai, baaki `excess`.
  */
-export async function fulfillOrder(orderId, { paymentId, method } = {}) {
+export async function fulfillOrder(orderId, opts = {}) {
+    const result = await fulfillTx(orderId, opts);
+    if (!result.already && result.order.receiptNos) {
+        const o = result.order;
+        receiptMessage(o.schoolId, o.studentId, money(Number(o.amount) - Number(o.excess)), o.receiptNos.split(',').join(', '));
+    }
+    return result;
+}
+
+function fulfillTx(orderId, { paymentId, method } = {}) {
     return sequelize.transaction(async (t) => {
         const order = await PaymentOrder.findByPk(orderId, { lock: t.LOCK.UPDATE, transaction: t });
         if (!order) throw ApiError.notFound('Order nahi mila');

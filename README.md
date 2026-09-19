@@ -171,6 +171,31 @@ Selfie `backend/private/` me rehti hai - static serve **nahi** hoti; sirf HR dek
 > Face *matching* (selfie asli usi insaan ki hai ya nahi) abhi nahi hai - admin selfie dekh kar verify karta hai.
 > Iske liye AWS Rekognition / Azure Face jaisi service jodni padegi.
 
+## Online fee payment
+
+- Parent app → **Fees** → fee chuniye → **Pay online** → `/pay/<token>` wala payment page (UPI, card, netbanking). App me koi native payment library nahi.
+- Rakam **server** tay karta hai (baaki fees se), client nahi. Receipt apne aap banti hai, mode `online`.
+- Admin → Fees → **Online payments**: provider *Band / Demo / Razorpay*, keys, webhook URL, aaj ke online payments.
+- Razorpay: checkout signature + webhook (HMAC) dono verify; ek hi payment do baar record nahi hota; secret encrypted (`SECRETS_KEY` env).
+- Demo seed me provider `demo` hai - asli paisa nahi katta.
+
+## SMS / WhatsApp alerts
+
+Admin → **SMS / WhatsApp** (Communication). Provider: *Band / Demo / SMS (MSG91) / WhatsApp (Meta Cloud API)*.
+
+| Event | Kisko | Kab |
+|---|---|---|
+| Bachcha absent | Parent (`guardianPhone`) | Aaj ki attendance me absent - din me ek hi baar, purani date sudharne par nahi |
+| Fees receipt | Parent | Counter payment ya online payment ke baad |
+| Fees reminder | Parent | Fees page → **Reminder bhejiye** (class filter ke saath) - ek student ko din me ek |
+| Leave approve/reject | Staff (`phone`) | Leave review hote hi |
+
+- Har event on/off; har event ke liye provider ka approved template (MSG91 DLT template id / WhatsApp template name). Variables ka kram page par likha hai (`##var1##` = school ...).
+- Message background me jaata hai - SMS fail ho to attendance/payment nahi rukta. Sab kuch **log** me (sent / failed / skipped + error).
+- Number `91XXXXXXXXXX` me badla jata hai; galat number = `skipped`.
+- Key encrypted rehti hai, GET me sirf aakhri 4 akshar.
+- Test me mock server: `MSG91_API_BASE`, `WHATSAPP_API_BASE` (aur `RAZORPAY_API_BASE`) env.
+
 ## Mobile app (Expo)
 
 ```bash

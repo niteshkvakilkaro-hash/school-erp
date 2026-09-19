@@ -8,6 +8,7 @@ import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { getPagination, paginated } from '../utils/pagination.js';
 import { scopedWhere, findScoped, assertSameTenant } from '../utils/tenant.js';
+import { notify, msgSettingsFor } from '../services/notify.js';
 
 const dateStr = z.coerce.date().transform((d) => d.toISOString().slice(0, 10));
 const today = () => new Date().toISOString().slice(0, 10);
@@ -396,6 +397,7 @@ export const collect = asyncHandler(async (req, res) => {
     const { payment, fee, pending } = await sequelize.transaction((t) =>
         recordPayment({ schoolId: req.schoolId, studentFeeId, amount, mode, reference, paidOn, collectedById: req.user.id, remarks }, t)
     );
+    receiptMessage(req.schoolId, fee.studentId, money(payment.amount), payment.receiptNo);
 
     res.status(201).json({
         success: true,
@@ -409,6 +411,64 @@ export const collect = asyncHandler(async (req, res) => {
             feeHead: fee.feeHead?.name || null,
             remainingPending: Math.max(0, money(pending - money(amount))),
         },
+    });
+});
+
+/** Receipt ka message parent ko (background me). */
+export async function receiptMessage(schoolId, studentId, amount, receiptNo) {
+    const s = await Student.findByPk(studentId, { attributes: ['id', 'firstName', 'lastName', 'guardianPhone'] });
+    if (!s) return;
+    notify(schoolId, 'feeReceipt', [
+        {
+            phone: s.guardianPhone,
+            studentId: s.id,
+            vars: { student: [s.firstName, s.lastName].filter(Boolean).join(' '), amount: amount.toLocaleString('en-IN'), receipt: receiptNo },
+            dedupeKey: 'receipt:' + receiptNo,
+        },
+    ]);
+}
+
+export const reminderSchema = z.object({
+    classId: z.coerce.number().int().positive().optional(),
+    sectionId: z.coerce.number().int().positive().optional(),
+});
+
+/**
+ * Baaki fees wale students ke parents ko reminder - ek student ko din me ek hi baar.
+ */
+export const sendReminders = asyncHandler(async (req, res) => {
+    const ms = await msgSettingsFor(req.schoolId);
+    if (ms.provider === 'none' || !ms.events.feeReminder) {
+        throw ApiError.badRequest('Fees reminder ka message band hai - Messages page se chalu kijiye');
+    }
+    const studentWhere = scopedWhere(req, { status: 'active' });
+    if (req.body.classId) studentWhere.classId = req.body.classId;
+    if (req.body.sectionId) studentWhere.sectionId = req.body.sectionId;
+
+    const rows = await StudentFee.findAll({
+        attributes: ['studentId', [literal('SUM(StudentFee.amount - StudentFee.discount - StudentFee.paid_amount)'), 'due']],
+        where: scopedWhere(req, { status: ['pending', 'partial'] }),
+        include: [{ model: Student, as: 'student', attributes: ['id', 'firstName', 'lastName', 'guardianPhone'], where: studentWhere }],
+        group: ['studentId', 'student.id'],
+        raw: true,
+        nest: true,
+    });
+    const due = rows.filter((r) => Number(r.due) > 0);
+    const date = today();
+    const queued = await notify(
+        req.schoolId,
+        'feeReminder',
+        due.map((r) => ({
+            phone: r.student.guardianPhone,
+            studentId: r.studentId,
+            vars: { student: [r.student.firstName, r.student.lastName].filter(Boolean).join(' '), amount: money(r.due).toLocaleString('en-IN') },
+            dedupeKey: 'reminder:' + r.studentId + ':' + date,
+        }))
+    );
+    res.json({
+        success: true,
+        message: due.length ? due.length + ' parents ko reminder bheja ja raha hai' : 'Kisi ki fees baaki nahi',
+        data: { students: due.length, queued: Number(queued) || 0 },
     });
 });
 

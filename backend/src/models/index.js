@@ -38,6 +38,8 @@ import StaffAttendance from './StaffAttendance.js';
 import LeaveRequest from './LeaveRequest.js';
 import PaymentSetting from './PaymentSetting.js';
 import PaymentOrder from './PaymentOrder.js';
+import MessagingSetting from './MessagingSetting.js';
+import MessageLog from './MessageLog.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -49,6 +51,7 @@ const TENANT_MODELS = [
     FeeHead, StudentFee, FeePayment, Period, TimetableSlot, Notice, Book, BookIssue,
     Vehicle, TransportRoute, RouteStop, StudentTransport, Admission, AdmissionLog, SchoolSite, SiteMedia,
     HrSetting, StaffAttendance, LeaveRequest, PaymentSetting, PaymentOrder,
+    MessagingSetting, MessageLog,
 ];
 for (const Model of TENANT_MODELS) {
     School.hasMany(Model, { foreignKey: 'schoolId', onDelete: 'CASCADE' });
@@ -288,4 +291,6 @@ export {
     LeaveRequest,
     PaymentSetting,
     PaymentOrder,
+    MessagingSetting,
+    MessageLog,
 };

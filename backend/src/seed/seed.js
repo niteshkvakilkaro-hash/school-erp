@@ -33,7 +33,7 @@ import { seedWebsite } from './_website.js';
 import { seedWebsiteMedia } from './_websiteMedia.js';
 import { UPLOAD_ROOT, PRIVATE_ROOT } from '../utils/upload.js';
 import { seedHr } from './_hr.js';
-import { PaymentSetting } from '../models/index.js';
+import { PaymentSetting, MessagingSetting } from '../models/index.js';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
 
@@ -380,6 +380,7 @@ async function run() {
         const hrStats = await seedHr(ctx.school);
         // Demo me online fee payment chalu - asli paisa nahi katta
         await PaymentSetting.create({ schoolId: ctx.school.id, provider: 'demo' });
+        await MessagingSetting.create({ schoolId: ctx.school.id, provider: 'demo' });
 
         console.log(
             '[seed] ' + def.name + ' (' + def.code + '): ' +

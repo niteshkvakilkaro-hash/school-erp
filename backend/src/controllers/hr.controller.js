@@ -11,6 +11,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { scopedWhere, findScoped, assertSameTenant } from '../utils/tenant.js';
 import { savePrivateImage, privatePath } from '../utils/upload.js';
 import { localDate, localTime, toMinutes, weekday, distanceM, eachDay } from '../utils/clock.js';
+import { notify } from '../services/notify.js';
 
 export { LEAVE_TYPES };
 
@@ -512,6 +513,17 @@ export const reviewLeave = asyncHandler(async (req, res) => {
         await row.update({ status, reviewNote: note || null, reviewedById: req.user.id, reviewedAt: new Date() }, { transaction: t });
         return row;
     });
+    const staff = await User.findByPk(l.userId, { attributes: ['id', 'name', 'phone'] });
+    if (staff) {
+        notify(req.schoolId, 'leaveDecision', [
+            {
+                phone: staff.phone,
+                userId: staff.id,
+                vars: { name: staff.name, dates: l.fromDate === l.toDate ? l.fromDate : l.fromDate + ' - ' + l.toDate, status: status === 'approved' ? 'approve' : 'reject' },
+                dedupeKey: 'leave:' + l.id,
+            },
+        ]);
+    }
     res.json({ success: true, message: 'Leave ' + status, data: l });
 });
 

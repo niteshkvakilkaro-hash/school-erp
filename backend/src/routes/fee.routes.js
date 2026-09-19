@@ -29,6 +29,8 @@ router.get('/payments', can('fees.view'), validate({ query: fees.paymentQuerySch
 router.post('/payments', can('fees.collect'), validate({ body: fees.paymentSchema }), fees.collect);
 router.delete('/payments/:id', can('fees.collect'), fees.removePayment);
 
+router.post('/reminders', can('fees.manage'), validate({ body: fees.reminderSchema }), fees.sendReminders);
+
 // ---- Online payment (Razorpay / demo) ----
 router.get('/online/settings', can('fees.view'), online.getSettings);
 router.put('/online/settings', can('fees.manage'), validate({ body: online.settingsSchema }), online.updateSettings);

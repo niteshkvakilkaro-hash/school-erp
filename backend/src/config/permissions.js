@@ -83,6 +83,9 @@ export const PERMISSIONS = [
     { slug: 'hr.view', module: 'HR', label: 'Staff ki live attendance, register aur leaves dekhna' },
     { slug: 'hr.manage', module: 'HR', label: 'Attendance sudharna, leave approve karna, HR settings' },
 
+    { slug: 'messages.view', module: 'Messages', label: 'SMS / WhatsApp ka record dekhna' },
+    { slug: 'messages.manage', module: 'Messages', label: 'SMS / WhatsApp setup aur test message' },
+
     // ---- Portal (mobile app) ----
     { slug: 'portal.self.view', module: 'Portal', label: 'Apna student record dekhna' },
     { slug: 'portal.child.view', module: 'Portal', label: 'Apne bachche ka record dekhna' },
@@ -143,6 +146,7 @@ export const SYSTEM_ROLES = [
             'exams.publish',
             'fees.view',
             'fees.report',
+            'messages.view',
         ],
     },
     {

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Search, Wallet, IndianRupee, TrendingUp, AlertCircle, Settings2, Plus, Smartphone } from 'lucide-react';
+import { Search, Wallet, IndianRupee, TrendingUp, AlertCircle, Settings2, Plus, Smartphone, BellRing } from 'lucide-react';
 import api from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -10,6 +10,7 @@ import { Input, Select } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { TableWrap, Table, THead, TBody, TR, TH, TD, EmptyRow, LoadingRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Modal } from '@/components/ui/modal';
 import { Pagination } from '@/components/ui/pagination';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { StudentLedger } from '@/components/fees/StudentLedger';
@@ -39,6 +40,8 @@ export default function Fees() {
     const [headsOpen, setHeadsOpen] = useState(false);
     const [assignOpen, setAssignOpen] = useState(false);
     const [onlineOpen, setOnlineOpen] = useState(false);
+    const [remindOpen, setRemindOpen] = useState(false);
+    const [reminding, setReminding] = useState(false);
 
     const search = useDebounce(searchInput, 400);
 
@@ -82,6 +85,20 @@ export default function Fees() {
         loadStudents();
     };
 
+    const sendReminders = async () => {
+        setReminding(true);
+        try {
+            const { data } = await api.post('/fees/reminders', classFilter ? { classId: Number(classFilter) } : {});
+            toast.success(data.message);
+            setRemindOpen(false);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setReminding(false);
+        }
+    };
+    const filterClassName = classes.find((c) => String(c.id) === String(classFilter))?.name;
+
     return (
         <div>
             <PageHeader
@@ -94,6 +111,9 @@ export default function Fees() {
                         </Button>
                         {canManage ? (
                         <>
+                            <Button variant="outline" onClick={() => setRemindOpen(true)}>
+                                <BellRing /> Reminder bhejiye
+                            </Button>
                             <Button variant="outline" onClick={() => setHeadsOpen(true)}>
                                 <Settings2 /> Fee heads
                             </Button>
@@ -269,6 +289,28 @@ export default function Fees() {
             <FeeHeadsModal open={headsOpen} onOpenChange={setHeadsOpen} onChanged={refreshAll} />
 
             <OnlinePaymentsModal open={onlineOpen} onClose={() => { setOnlineOpen(false); refreshAll(); }} canManage={canManage} />
+            <Modal
+                open={remindOpen}
+                onOpenChange={setRemindOpen}
+                title="Fees reminder"
+                description={'Jinki fees baaki hai unke parents ko SMS / WhatsApp - ' + (filterClassName ? 'sirf ' + filterClassName : 'saari classes')}
+                size="sm"
+                footer={
+                    <>
+                        <Button variant="outline" onClick={() => setRemindOpen(false)} disabled={reminding}>
+                            Cancel
+                        </Button>
+                        <Button onClick={sendReminders} disabled={reminding}>
+                            <BellRing /> {reminding ? 'Bhej rahe hain...' : 'Bhejiye'}
+                        </Button>
+                    </>
+                }
+            >
+                <p className="text-sm text-muted-foreground">
+                    Har parent ko baaki rakam ke saath ek message jayega. Ek din me ek student ko ek hi reminder jata hai - dobara dabane par double nahi hoga.
+                    {filterClassName ? null : ' Kisi ek class ko bhejna ho to pehle upar class filter chuniye.'}
+                </p>
+            </Modal>
             <AssignFeesModal
                 open={assignOpen}
                 onOpenChange={setAssignOpen}

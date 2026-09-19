@@ -5,6 +5,7 @@ import { ATTENDANCE_STATUS } from '../models/Attendance.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { scopedWhere, assertSameTenant } from '../utils/tenant.js';
+import { notify } from '../services/notify.js';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const dateStr = z.coerce.date().transform((d) => d.toISOString().slice(0, 10));
@@ -145,6 +146,23 @@ export const markBulk = asyncHandler(async (req, res) => {
             updateOnDuplicate: ['status', 'remarks', 'markedById', 'classId', 'sectionId', 'updatedAt'],
         })
     );
+
+    // Aaj absent - parent ko message (pichhli date sudharne par nahi; ek din me ek hi baar)
+    const absentIds = entries.filter((e) => e.status === 'absent').map((e) => e.studentId);
+    if (date === today() && absentIds.length) {
+        const kids = await Student.findAll({ where: scopedWhere(req, { id: absentIds }), attributes: ['id', 'firstName', 'lastName', 'guardianPhone'] });
+        const dd = new Date(date + 'T12:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        notify(
+            req.schoolId,
+            'absent',
+            kids.map((k) => ({
+                phone: k.guardianPhone,
+                studentId: k.id,
+                vars: { student: [k.firstName, k.lastName].filter(Boolean).join(' '), date: dd },
+                dedupeKey: 'absent:' + k.id + ':' + date,
+            }))
+        );
+    }
 
     res.json({
         success: true,

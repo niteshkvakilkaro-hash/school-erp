@@ -13,6 +13,7 @@ import {
     FileSpreadsheet,
     Wallet,
     Megaphone,
+    MessageSquareText,
     Library,
     Bus,
     ShieldCheck,
@@ -97,6 +98,7 @@ const SCHOOL_GROUPS = [
         title: 'Communication',
         items: [
             { to: '/notices', label: 'Notices', icon: Megaphone, perm: ['notices.view'] },
+            { to: '/messages', label: 'SMS / WhatsApp', icon: MessageSquareText, perm: ['messages.view'] },
         ],
     },
     {
