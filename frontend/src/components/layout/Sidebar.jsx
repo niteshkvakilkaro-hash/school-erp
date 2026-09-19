@@ -16,6 +16,7 @@ import {
     MessageSquareText,
     CalendarPlus,
     DatabaseBackup,
+    History,
     Library,
     Bus,
     ShieldCheck,
@@ -51,7 +52,10 @@ const PLATFORM_GROUPS = [
     },
     {
         title: 'System',
-        items: [{ to: '/platform/backups', label: 'Backups', icon: DatabaseBackup, perm: ['platform.backups.manage'] }],
+        items: [
+            { to: '/platform/backups', label: 'Backups', icon: DatabaseBackup, perm: ['platform.backups.manage'] },
+            { to: '/platform/activity', label: 'Activity log', icon: History, perm: ['platform.dashboard.view'] },
+        ],
     },
 ];
 
@@ -114,6 +118,7 @@ const SCHOOL_GROUPS = [
             { to: '/roles', label: 'Roles & Permissions', icon: ShieldCheck, perm: ['roles.view', 'roles.manage'] },
             { to: '/settings', label: 'School Settings', icon: Settings, perm: ['school.settings.view'] },
             { to: '/website', label: 'Website', icon: Globe, perm: ['website.manage'] },
+            { to: '/activity', label: 'Activity log', icon: History, perm: ['audit.view'] },
         ],
     },
 ];

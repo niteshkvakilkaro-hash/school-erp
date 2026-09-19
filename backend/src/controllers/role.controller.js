@@ -4,6 +4,7 @@ import { sequelize, Role, Permission, User } from '../models/index.js';
 import { syncRolePermissions } from '../services/rbac.service.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { logEvent } from '../services/audit.js';
 import { scopedWhere, findScoped } from '../utils/tenant.js';
 
 const slugify = (v) =>
@@ -147,7 +148,21 @@ export const update = asyncHandler(async (req, res) => {
         if (Object.keys(patch).length) await role.update(patch, { transaction: t });
 
         if (permissions !== undefined) {
+            const had = (await role.getPermissions({ attributes: ['slug'], transaction: t })).map((p) => p.slug);
             await syncRolePermissions(role, permissions, { transaction: t });
+            const added = permissions.filter((p) => !had.includes(p));
+            const removed = had.filter((p) => !permissions.includes(p));
+            if (added.length || removed.length) {
+                logEvent({
+                    action: 'role.permissions',
+                    module: 'Roles',
+                    entity: 'role',
+                    entityId: role.id,
+                    summary: 'Role "' + role.name + '" ki permissions badli: +' + added.length + ' / -' + removed.length,
+                    changes: { added, removed },
+                    transaction: t,
+                });
+            }
         }
     });
 

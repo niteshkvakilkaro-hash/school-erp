@@ -171,6 +171,20 @@ Selfie `backend/private/` me rehti hai - static serve **nahi** hoti; sirf HR dek
 > Face *matching* (selfie asli usi insaan ki hai ya nahi) abhi nahi hai - admin selfie dekh kar verify karta hai.
 > Iske liye AWS Rekognition / Azure Face jaisi service jodni padegi.
 
+## Activity log (audit)
+
+Settings → **Activity log** (`audit.view` - School Admin, Principal). Super Admin: System → Activity log (platform ke kaam, jaise backup download; school chunkar us school ka log).
+
+**Apne aap** (DB hooks, kisi controller ko yaad nahi rakhna padta): student, user, role, school settings, class/section/subject, fee head, student fee, **receipt banana / cancel**, exam, staff attendance sudhar, leave approve/reject, HR / online payment / SMS settings, notice - har badlav ka **pehle → baad** (sirf badle fields).
+
+**Alag se**: login / galat password (IP ke saath), OTP password reset, class attendance (kis bachche ka status badla), **marks badle** (40 → 35), role permissions (+ / -), fees lagana / reminder, promotion / undo, Excel import, backup download.
+
+- Kaun (naam + role us waqt ka), kab, IP, browser. Online payment jaise kaam "System" ke naam se.
+- Transaction rollback hua to log nahi banta (commit ke baad hi likha jaata hai). Seed / scripts ka shor nahi.
+- Password, keys, OTP kabhi log me nahi - sirf "(badla)".
+- Filter: module, user, tareekh, search (receipt no, naam). **CSV** download (Excel formula injection se bacha hua).
+- Sirf likha jaata hai - badalne / mitane ka koi API nahi.
+
 ## Backup
 
 Roz raat (`BACKUP_TIME`, default 02:00 school time) apne aap: **database (mysqldump) + `uploads/` + `private/`** → `.tar.gz` → **AES-256-GCM encrypt** (`BACKUP_PASSWORD`) → khol kar jaanch → `backend/backups/` → cloud (agar set) → purane hatao → report email. Server raat ko band tha to chalu hote hi le leta hai; fail ho to din me 3 baar tak dobara.

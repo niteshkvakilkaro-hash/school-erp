@@ -6,6 +6,11 @@ import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import { env, isProd } from './config/env.js';
 import routes from './routes/index.js';
+import { auditContextMiddleware } from './utils/auditContext.js';
+import { installAuditHooks } from './services/audit.js';
+
+// Zaroori tables ka har badlav activity log me
+installAuditHooks();
 import { notFoundHandler, errorHandler } from './middleware/error.js';
 import { UPLOAD_ROOT } from './utils/upload.js';
 import { mountWebApps } from './webApps.js';
@@ -80,6 +85,8 @@ app.use(
     })
 );
 
+// Activity log ke liye request ka context (kaun, kahan se)
+app.use('/api', auditContextMiddleware);
 app.use('/api', routes);
 
 // Fees ka payment page (app / APK isi ko kholti hai)

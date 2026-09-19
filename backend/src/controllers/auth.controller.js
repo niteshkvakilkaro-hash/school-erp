@@ -13,6 +13,7 @@ import {
 import { signToken } from '../middleware/auth.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { logEvent } from '../services/audit.js';
 
 export const loginSchema = z.object({
     email: z
@@ -135,7 +136,13 @@ export const login = asyncHandler(async (req, res) => {
     for (const u of matches) {
         if (await u.verifyPassword(password)) candidates.push(u);
     }
-    if (candidates.length === 0) throw ApiError.unauthorized('Email ya password galat hai');
+    if (candidates.length === 0) {
+        // Kisi ke account par galat password - us school ke log me (IP ke saath)
+        for (const u of matches) {
+            logEvent({ action: 'auth.login_failed', module: 'Auth', entity: 'user', entityId: u.id, schoolId: u.schoolId, user: u, summary: 'Galat password se login ki koshish - ' + u.email });
+        }
+        throw ApiError.unauthorized('Email ya password galat hai');
+    }
 
     if (candidates.length > 1) {
         // Frontend school picker dikha kar dubara schoolCode ke saath bhejega
@@ -158,6 +165,7 @@ export const login = asyncHandler(async (req, res) => {
     }
 
     await user.update({ lastLoginAt: new Date() });
+    logEvent({ action: 'auth.login', module: 'Auth', entity: 'user', entityId: user.id, schoolId: user.schoolId, user, summary: 'Login - ' + user.name + ' (' + (user.role?.name || '') + ')' });
 
     res.json({
         success: true,

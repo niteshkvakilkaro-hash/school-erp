@@ -3,6 +3,7 @@ import { Op, literal } from 'sequelize';
 import { sequelize, School, Student, SchoolClass, Section, StudentFee, PromotionRun, StudentEnrollment, User } from '../models/index.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { logEvent } from '../services/audit.js';
 
 const UNDO_DAYS = 30;
 
@@ -212,6 +213,7 @@ export const runPromotion = asyncHandler(async (req, res) => {
         }
         await school.update({ session: toSession }, { transaction: t });
         await run.update(counts, { transaction: t });
+        logEvent({ action: 'session.promote', module: 'Session', entity: 'promotion', entityId: run.id, summary: 'Naya session ' + school.session + ' → ' + toSession + ': ' + counts.promoted + ' promote, ' + counts.detained + ' roke, ' + counts.graduated + ' pass-out, ' + counts.left + ' chhode', transaction: t });
         return { runId: run.id, fromSession: run.fromSession, toSession, ...counts, noSection, total: students.length };
     });
 
@@ -269,6 +271,7 @@ export const undo = asyncHandler(async (req, res) => {
         await StudentEnrollment.destroy({ where: { runId: run.id }, transaction: t });
         await run.update({ undoneAt: new Date(), undoneById: req.user.id }, { transaction: t });
         await school.update({ session: run.fromSession }, { transaction: t });
+        logEvent({ action: 'session.undo', module: 'Session', entity: 'promotion', entityId: run.id, summary: 'Promotion undo ' + run.toSession + ' → ' + run.fromSession + ': ' + restored + ' wapas, ' + skipped.length + ' chhode', transaction: t });
         return { restored, skipped, session: run.fromSession };
     });
     res.json({

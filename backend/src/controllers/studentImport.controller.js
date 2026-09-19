@@ -2,6 +2,7 @@ import multer from 'multer';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { readSheet, analyse, commit, buildTemplate } from '../services/studentImport.js';
+import { logEvent } from '../services/audit.js';
 
 const sheetUpload = multer({
     storage: multer.memoryStorage(),
@@ -51,6 +52,7 @@ export const preview = asyncHandler(async (req, res) => {
 export const importStudents = asyncHandler(async (req, res) => {
     const a = await analyseRequest(req);
     const result = await commit(req.schoolId, a, { skipErrors: flag(req.body.skipErrors) });
+    logEvent({ action: 'student.import', module: 'Students', entity: 'import', summary: 'Excel se ' + result.created + ' students import (' + (req.file.originalname || '').slice(0, 80) + ')' + (result.parentsCreated ? ', ' + result.parentsCreated + ' parent login' : '') + (result.skipped ? ', ' + result.skipped + ' rows chhodi' : '') });
     res.status(201).json({
         success: true,
         message: result.created + ' students import ho gaye' + (result.parentsCreated ? ', ' + result.parentsCreated + ' parent login bane' : ''),

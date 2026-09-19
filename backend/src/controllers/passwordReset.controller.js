@@ -7,6 +7,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { safeEqual } from '../utils/secrets.js';
 import { isProd } from '../config/env.js';
 import { msgSettingsFor, notify, normalizePhone } from '../services/notify.js';
+import { setAuditActor } from '../utils/auditContext.js';
+import { logEvent } from '../services/audit.js';
 
 const OTP_TTL_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
@@ -109,8 +111,10 @@ export const resetPassword = asyncHandler(async (req, res) => {
         const user = await User.scope('withPassword').findByPk(r.row.userId, { transaction: t, lock: t.LOCK.UPDATE });
         if (!user || user.status !== 'active') return { error: 'Account active nahi hai' };
         if (await user.verifyPassword(req.body.newPassword)) return { error: 'Naya password purane se alag rakhiye', pwd: true };
+        setAuditActor(user, user.schoolId);
         user.password = req.body.newPassword;
         await user.save({ transaction: t });
+        logEvent({ action: 'auth.password_reset', module: 'Auth', entity: 'user', entityId: user.id, schoolId: user.schoolId, user, summary: 'OTP se password reset - ' + user.email, transaction: t });
         await r.row.update({ usedAt: new Date() }, { transaction: t });
         await PasswordReset.update({ usedAt: new Date() }, { where: { userId: user.id, usedAt: null }, transaction: t });
         return { ok: true };

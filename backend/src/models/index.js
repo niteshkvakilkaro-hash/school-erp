@@ -44,6 +44,7 @@ import PasswordReset from './PasswordReset.js';
 import PromotionRun from './PromotionRun.js';
 import StudentEnrollment from './StudentEnrollment.js';
 import BackupRun from './BackupRun.js';
+import AuditLog from './AuditLog.js';
 
 /* ---------------- SaaS / tenancy ---------------- */
 
@@ -312,4 +313,5 @@ export {
     PromotionRun,
     StudentEnrollment,
     BackupRun,
+    AuditLog,
 };

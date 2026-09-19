@@ -9,6 +9,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { getPagination, paginated } from '../utils/pagination.js';
 import { scopedWhere, findScoped, assertSameTenant } from '../utils/tenant.js';
 import { notify, msgSettingsFor } from '../services/notify.js';
+import { logEvent } from '../services/audit.js';
 
 const dateStr = z.coerce.date().transform((d) => d.toISOString().slice(0, 10));
 const today = () => new Date().toISOString().slice(0, 10);
@@ -215,6 +216,9 @@ export const assign = asyncHandler(async (req, res) => {
         }
     });
 
+    if (created || updated) {
+        logEvent({ action: 'fee.assign', module: 'Fees', summary: 'Fees lagayi - ' + heads.map((h) => h.name).join(', ') + ': ' + created + ' nayi, ' + updated + ' update (' + students.length + ' students)' });
+    }
     res.json({
         success: true,
         message:
@@ -455,6 +459,7 @@ export const sendReminders = asyncHandler(async (req, res) => {
     });
     const due = rows.filter((r) => Number(r.due) > 0);
     const date = today();
+    logEvent({ action: 'fee.reminders', module: 'Fees', summary: 'Fees reminder bheje - ' + due.length + ' parents' });
     const queued = await notify(
         req.schoolId,
         'feeReminder',

@@ -6,6 +6,7 @@ import {
 import { EXAM_TYPES } from '../models/Exam.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { logEvent } from '../services/audit.js';
 import { getPagination, paginated } from '../utils/pagination.js';
 import { scopedWhere, findScoped, assertSameTenant } from '../utils/tenant.js';
 
@@ -327,8 +328,12 @@ export const saveMarks = asyncHandler(async (req, res) => {
     const valid = await Student.count({ where: scopedWhere(req, { id: ids }) });
     if (valid !== ids.length) throw ApiError.badRequest('Kuch students aapke school ke nahi hain');
 
-    await sequelize.transaction(async (t) =>
-        Mark.bulkCreate(
+    const prevMarks = await Mark.findAll({ where: { examSubjectId: examSubject.id, studentId: ids }, attributes: ['studentId', 'marksObtained', 'isAbsent'] });
+    const fmt = (m) => (m.isAbsent ? 'Absent' : m.marksObtained == null ? '-' : String(Number(m.marksObtained)));
+    const before = Object.fromEntries(prevMarks.map((m) => [m.studentId, fmt(m)]));
+
+    await sequelize.transaction(async (t) => {
+        await Mark.bulkCreate(
             entries.map((e) => ({
                 schoolId: req.schoolId,
                 examSubjectId: examSubject.id,
@@ -343,8 +348,30 @@ export const saveMarks = asyncHandler(async (req, res) => {
                 transaction: t,
                 updateOnDuplicate: ['marksObtained', 'isAbsent', 'remarks', 'enteredById', 'updatedAt'],
             }
-        )
-    );
+        );
+        // Pehle se bhare marks badle to naam ke saath - yahi sabse zaroori hai
+        const changed = entries.filter((e) => before[e.studentId] !== undefined && before[e.studentId] !== fmt({ isAbsent: e.isAbsent, marksObtained: e.isAbsent ? null : e.marksObtained ?? null }));
+        const full = await ExamSubject.findByPk(examSubject.id, { include: [{ model: Exam, as: 'exam', attributes: ['name'] }, { model: Subject, as: 'subject', attributes: ['name'] }], transaction: t });
+        let changes = null;
+        if (changed.length) {
+            const names = await Student.findAll({ where: { id: changed.map((c) => c.studentId) }, attributes: ['id', 'firstName', 'lastName', 'admissionNo'], transaction: t });
+            changes = Object.fromEntries(
+                names.map((n) => {
+                    const e = entries.find((x) => x.studentId === n.id);
+                    return [[n.firstName, n.lastName].filter(Boolean).join(' ') + ' (' + n.admissionNo + ')', { from: before[n.id], to: fmt({ isAbsent: e.isAbsent, marksObtained: e.isAbsent ? null : e.marksObtained ?? null }) }];
+                })
+            );
+        }
+        logEvent({
+            action: changed.length ? 'marks.update' : 'marks.enter',
+            module: 'Exams',
+            entity: 'exam_subject',
+            entityId: examSubject.id,
+            summary: (changed.length ? 'Marks badle' : 'Marks bhare') + ' - ' + (full?.exam?.name || 'Exam') + ' / ' + (full?.subject?.name || 'Subject') + ': ' + entries.length + ' students' + (changed.length ? ', ' + changed.length + ' badle' : ''),
+            changes,
+            transaction: t,
+        });
+    });
 
     res.json({ success: true, message: entries.length + ' entries save ho gayi' });
 });

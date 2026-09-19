@@ -84,6 +84,8 @@ export const PERMISSIONS = [
     { slug: 'hr.view', module: 'HR', label: 'Staff ki live attendance, register aur leaves dekhna' },
     { slug: 'hr.manage', module: 'HR', label: 'Attendance sudharna, leave approve karna, HR settings' },
 
+    { slug: 'audit.view', module: 'Activity log', label: 'Kisne kya badla - activity log dekhna / download' },
+
     { slug: 'sessions.manage', module: 'Session', label: 'Naya session shuru karna - promotion, pass-out, undo' },
 
     { slug: 'messages.view', module: 'Messages', label: 'SMS / WhatsApp ka record dekhna' },
@@ -122,7 +124,7 @@ export const SYSTEM_ROLES = [
         name: 'Principal',
         scope: 'school',
         description: 'Sab kuch dekh sakte hain, students edit kar sakte hain',
-        permissions: ['hr.self', 'hr.view', 'hr.manage', 'sessions.manage',
+        permissions: ['hr.self', 'hr.view', 'hr.manage', 'sessions.manage', 'audit.view',
             'dashboard.view',
             'students.view',
             'students.update',

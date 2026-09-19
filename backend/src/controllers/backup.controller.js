@@ -6,6 +6,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { runBackup, isRunning, backupFilePath, nextRunAt, usingFallbackPassword } from '../services/backup/index.js';
 import { isConfigured } from '../services/backup/s3.js';
 import { mailConfigured } from '../services/mailer.js';
+import { logEvent } from '../services/audit.js';
 
 const shape = (r) => ({
     id: r.id,
@@ -65,6 +66,7 @@ export const download = asyncHandler(async (req, res) => {
     const run = await BackupRun.findByPk(req.params.id);
     const file = backupFilePath(run);
     if (!file) throw ApiError.notFound('Ye backup file server par nahi hai (purani hat gayi ya fail hua tha)');
+    logEvent({ action: 'backup.download', module: 'Backup', entity: 'backup', entityId: run.id, schoolId: null, summary: 'Backup download - ' + run.fileName });
     res.set('Content-Type', 'application/octet-stream');
     res.set('Content-Disposition', 'attachment; filename="' + run.fileName + '"');
     res.set('Content-Length', String(fs.statSync(file).size));

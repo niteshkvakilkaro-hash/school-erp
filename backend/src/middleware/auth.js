@@ -3,6 +3,7 @@ import { env } from '../config/env.js';
 import { User, Role, Permission, School } from '../models/index.js';
 import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { setAuditActor } from '../utils/auditContext.js';
 
 export const signToken = (user) =>
     jwt.sign({ id: user.id, schoolId: user.schoolId ?? null, tv: user.tokenVersion || 0 }, env.jwt.secret, {
@@ -46,6 +47,7 @@ export const authenticate = asyncHandler(async (req, _res, next) => {
     req.user = user;
     req.permissions = new Set((user.role?.permissions || []).map((p) => p.slug));
     req.isPlatformUser = user.schoolId === null;
+    setAuditActor(user, user.schoolId);
 
     next();
 });
@@ -62,6 +64,7 @@ export const resolveTenant = asyncHandler(async (req, _res, next) => {
             if (!school) throw ApiError.notFound('School not found');
             req.schoolId = school.id;
             req.school = school;
+            setAuditActor(req.user, school.id);
         } else {
             req.schoolId = null;
         }

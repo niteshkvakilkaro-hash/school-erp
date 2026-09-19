@@ -6,6 +6,7 @@ import ApiError from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { scopedWhere, assertSameTenant } from '../utils/tenant.js';
 import { notify } from '../services/notify.js';
+import { logEvent } from '../services/audit.js';
 
 const today = () => new Date().toISOString().slice(0, 10);
 const dateStr = z.coerce.date().transform((d) => d.toISOString().slice(0, 10));
@@ -140,12 +141,39 @@ export const markBulk = asyncHandler(async (req, res) => {
         markedById: req.user.id,
     }));
 
-    await sequelize.transaction(async (t) =>
-        Attendance.bulkCreate(rows, {
+    // Pehle kya tha - activity log me sirf badle hue bachche
+    const prev = await Attendance.findAll({ where: { schoolId: req.schoolId, date, studentId: ids }, attributes: ['studentId', 'status'] });
+    const prevBy = Object.fromEntries(prev.map((p) => [p.studentId, p.status]));
+
+    await sequelize.transaction(async (t) => {
+        await Attendance.bulkCreate(rows, {
             transaction: t,
             updateOnDuplicate: ['status', 'remarks', 'markedById', 'classId', 'sectionId', 'updatedAt'],
-        })
-    );
+        });
+        const changed = entries.filter((e) => prevBy[e.studentId] && prevBy[e.studentId] !== e.status);
+        const cls = await SchoolClass.findByPk(classId, { attributes: ['name'], transaction: t });
+        const count = (st) => entries.filter((e) => e.status === st).length;
+        let changes = null;
+        if (changed.length) {
+            const names = await Student.findAll({ where: { id: changed.map((c) => c.studentId) }, attributes: ['id', 'firstName', 'lastName', 'admissionNo'], transaction: t });
+            changes = Object.fromEntries(
+                names.map((n) => [
+                    [n.firstName, n.lastName].filter(Boolean).join(' ') + ' (' + n.admissionNo + ')',
+                    { from: prevBy[n.id], to: entries.find((e) => e.studentId === n.id).status },
+                ])
+            );
+        }
+        logEvent({
+            action: changed.length ? 'attendance.update' : 'attendance.mark',
+            module: 'Attendance',
+            entity: 'attendance',
+            entityId: classId + ':' + (sectionId || '') + ':' + date,
+            summary:
+                (changed.length ? 'Attendance sudhari' : 'Attendance lagayi') + ' - ' + (cls?.name || 'Class') + ', ' + date + ': ' + count('present') + ' present, ' + count('absent') + ' absent' + (changed.length ? ' (' + changed.length + ' badle)' : ''),
+            changes,
+            transaction: t,
+        });
+    });
 
     // Aaj absent - parent ko message (pichhli date sudharne par nahi; ek din me ek hi baar)
     const absentIds = entries.filter((e) => e.status === 'absent').map((e) => e.studentId);
